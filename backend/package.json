@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for electricity co2 graphs",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "author": "roopeh",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}
