@@ -1,7 +1,7 @@
 {
   "extends": [
-    "airbnb",
-    "airbnb-typescript"
+    "airbnb-base",
+    "airbnb-typescript/base"
   ],
   "plugins": ["@typescript-eslint"],
   "env": {
@@ -11,14 +11,7 @@
     "node": true
   },
   "rules": {
-    "@typescript-eslint/quotes": ["error", "double"],
-    "react/function-component-definition": [
-      2,
-      {
-        "namedComponents": "arrow-function",
-        "unnamedComponents": "arrow-function"
-      }
-    ]
+    "@typescript-eslint/quotes": ["error", "double"]
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
