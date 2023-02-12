@@ -1,0 +1,17 @@
+.graphContainer {
+  display: flex;
+  flex-direction: row;
+  width: 65vw;
+  height: calc(65vw * 0.5);
+  margin: 0 auto;
+}
+
+.graphLabelLegend {
+  align-self: center;
+  writing-mode: sideways-lr;
+  margin-right: 15px;
+  margin-left: -25px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: smaller;
+  color: gray;
+}
