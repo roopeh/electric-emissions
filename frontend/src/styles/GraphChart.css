@@ -1,9 +1,20 @@
+:root {
+  --defaultWidth: calc(min(max(65vw, 500px), 1000px));
+}
+
 .graphContainer {
   display: flex;
   flex-direction: row;
-  width: 65vw;
-  height: calc(65vw * 0.5);
+  width: var(--defaultWidth);
+  height: calc(var(--defaultWidth) * 0.5);
   margin: 0 auto;
+}
+
+.graphDateContainer {
+  display: flex;
+  width: var(--defaultWidth);
+  margin: 0 auto;
+  justify-content: space-around;
 }
 
 .graphLabelLegend {

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Chart as ChartJS, ChartData, CategoryScale, Legend, LinearScale, LineElement,
   PointElement, Title, Tooltip, ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import DatePickers from "./DatePickers";
 import { JsonData } from "../utils/types";
-import "react-datepicker/dist/react-datepicker.css";
 import "../styles/GraphChart.css";
 
 ChartJS.register(
@@ -23,6 +23,9 @@ interface GraphChartProps {
 }
 
 const GraphChart = ({ consumedData }: GraphChartProps) => {
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
   const generateDateLabels = (dates: Array<string>): Array<string> => {
     let previousDay: number = -1;
     return dates.map((rawDate) => {
@@ -73,14 +76,23 @@ const GraphChart = ({ consumedData }: GraphChartProps) => {
   };
 
   return (
-    <div className="graphContainer">
-      <div className="graphLabelLegend">
-        g CO
-        <sub>2</sub>
-        {" / kWh"}
+    <>
+      <DatePickers
+        startDate={startDate}
+        endDate={endDate}
+        startChangeFunc={setStartDate}
+        endChangeFunc={setEndDate}
+      />
+      <br />
+      <div className="graphContainer">
+        <div className="graphLabelLegend">
+          g CO
+          <sub>2</sub>
+          {" / kWh"}
+        </div>
+        <Line options={options} data={chartData} />
       </div>
-      <Line options={options} data={chartData} />
-    </div>
+    </>
   );
 };
 
