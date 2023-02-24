@@ -22,25 +22,6 @@ ChartJS.register(
   Legend,
 );
 
-const canToggleMajorHourLabels = (initDate: Date | null): boolean => {
-  const start = !initDate || !initDate.getTime() ? new Date() : initDate;
-  start.setHours(0, 0, 0, 0);
-  const hourDiff = (new Date().getTime() - start.getTime()) / 1000 / 3600;
-  // Show hours in major ticks only if current time is less than 6 hours after midnight
-  return hourDiff <= 6;
-};
-
-// Declare outside of TSX element, otherwise i.e. chart re-render resets it
-let toggleMajorHourLabels = canToggleMajorHourLabels(null);
-
-const updateMajorLabels = (start: Date, end: Date): void => {
-  if (start.getDate() === end.getDate()) {
-    toggleMajorHourLabels = canToggleMajorHourLabels(start);
-  } else {
-    toggleMajorHourLabels = false;
-  }
-};
-
 const GraphChart = () => {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
@@ -133,7 +114,7 @@ const GraphChart = () => {
             const { tick } = ctx;
             if (tick) {
               const date = new Date(tick.value);
-              if (tick.major && !toggleMajorHourLabels) {
+              if (tick.major && date.getHours() === 0) {
                 tick.label = date.toLocaleDateString("default", {
                   day: "2-digit",
                   month: "short",
@@ -220,7 +201,6 @@ const GraphChart = () => {
       // Do not update state hook if the day didn't change
       return;
     }
-    updateMajorLabels(date, endDate);
     setStartDate(date);
   };
 
@@ -231,7 +211,6 @@ const GraphChart = () => {
       // Do not update state hook if the day didn't change
       return;
     }
-    updateMajorLabels(startDate, date);
     setEndDate(date);
   };
 
