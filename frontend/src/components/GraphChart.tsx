@@ -26,6 +26,7 @@ const GraphChart = () => {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [consumedEmissions, setConsumedEmissions] = useState<Array<JsonData>>([]);
+  const [productionEmissions, setProductionEmissions] = useState<Array<JsonData>>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -33,7 +34,9 @@ const GraphChart = () => {
         const isoStartDate = startDate.toISOString();
         const isoEndDate = endDate.toISOString();
         const consumedResult = await axios.get(`http://localhost:3001/consumed/${isoStartDate}/${isoEndDate}`);
+        const productionResult = await axios.get(`http://localhost:3001/production/${isoStartDate}/${isoEndDate}`);
         setConsumedEmissions(consumedResult.data);
+        setProductionEmissions(productionResult.data);
       } catch (err) {
         if (err instanceof AxiosError) {
           console.log(err.response?.data);
@@ -138,7 +141,10 @@ const GraphChart = () => {
       tooltip: {
         callbacks: {
           label: (label) => (
-            `Emission factor for electricity consumed: ${label.formattedValue} g CO2 / kWh`
+            `Emission factor ${label.datasetIndex === 0
+              ? "for electricity consumed"
+              : "of electricity production"
+            }: ${label.formattedValue} g CO2 / kWh`
           ),
           title(tooltipItems) {
             const rawTime = tooltipItems.at(0)?.parsed.x;
@@ -169,6 +175,12 @@ const GraphChart = () => {
         label: "Emission factor for electricity consumed in Finland",
         data: consumedEmissions.map((itr) => itr.value),
         borderColor: "rgb(255, 99, 132)",
+        pointRadius: 0,
+      },
+      {
+        label: "Emission factor of electricity production in Finland",
+        data: productionEmissions.map((itr) => itr.value),
+        borderColor: "rgb(99, 255, 132)",
         pointRadius: 0,
       },
     ],
