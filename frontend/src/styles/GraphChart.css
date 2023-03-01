@@ -12,7 +12,19 @@
 
 .graphDateContainer {
   display: flex;
+  flex-direction: column;
   width: var(--defaultWidth);
   margin: 0 auto;
+}
+
+.graphDatePickers {
+  display: flex;
   justify-content: space-around;
+}
+
+.graphFixedDateContainer {
+  display: flex;
+  width: var(--defaultWidth);
+  margin: 0 auto;
+  justify-content: center;
 }

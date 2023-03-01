@@ -8,7 +8,7 @@ import { AnyObject } from "chart.js/dist/types/basic";
 import "chartjs-adapter-date-fns";
 import { Line } from "react-chartjs-2";
 import DatePickers from "./DatePickers";
-import { JsonData } from "../utils/types";
+import { GraphDates, GraphDatasets, JsonData } from "../types";
 import "../styles/GraphChart.css";
 
 ChartJS.register(
@@ -23,20 +23,23 @@ ChartJS.register(
 );
 
 const GraphChart = () => {
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [consumedEmissions, setConsumedEmissions] = useState<Array<JsonData>>([]);
-  const [productionEmissions, setProductionEmissions] = useState<Array<JsonData>>([]);
+  const [dates, setDates] = useState<GraphDates>({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const [graphEmissions, setGraphEmissions] = useState<GraphDatasets>({
+    consumed: new Array<JsonData>(),
+    production: new Array<JsonData>(),
+  });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const isoStartDate = startDate.toISOString();
-        const isoEndDate = endDate.toISOString();
+        const isoStartDate = dates.startDate.toISOString();
+        const isoEndDate = dates.endDate.toISOString();
         const consumedResult = await axios.get(`http://localhost:3001/consumed/${isoStartDate}/${isoEndDate}`);
         const productionResult = await axios.get(`http://localhost:3001/production/${isoStartDate}/${isoEndDate}`);
-        setConsumedEmissions(consumedResult.data);
-        setProductionEmissions(productionResult.data);
+        setGraphEmissions({ consumed: consumedResult.data, production: productionResult.data });
       } catch (err) {
         if (err instanceof AxiosError) {
           console.log(err.response?.data);
@@ -46,7 +49,7 @@ const GraphChart = () => {
     };
 
     loadData();
-  }, [startDate, endDate]);
+  }, [dates]);
 
   const options: ChartOptions<"line"> = {
     responsive: true,
@@ -169,17 +172,17 @@ const GraphChart = () => {
   };
 
   const chartData: ChartData<"line"> = {
-    labels: consumedEmissions.map((itr) => itr.start_time),
+    labels: graphEmissions.consumed.map((itr) => itr.start_time),
     datasets: [
       {
         label: "Emission factor for electricity consumed in Finland",
-        data: consumedEmissions.map((itr) => itr.value),
+        data: graphEmissions.consumed.map((itr) => itr.value),
         borderColor: "rgb(255, 99, 132)",
         pointRadius: 0,
       },
       {
         label: "Emission factor of electricity production in Finland",
-        data: productionEmissions.map((itr) => itr.value),
+        data: graphEmissions.production.map((itr) => itr.value),
         borderColor: "rgb(99, 255, 132)",
         pointRadius: 0,
       },
@@ -206,33 +209,11 @@ const GraphChart = () => {
     },
   }];
 
-  const changeStartDate = (date: Date): void => {
-    if (date.getFullYear() === startDate.getFullYear()
-      && date.getMonth() === startDate.getMonth()
-      && date.getDate() === startDate.getDate()) {
-      // Do not update state hook if the day didn't change
-      return;
-    }
-    setStartDate(date);
-  };
-
-  const changeEndDate = (date: Date): void => {
-    if (date.getFullYear() === endDate.getFullYear()
-      && date.getMonth() === endDate.getMonth()
-      && date.getDate() === endDate.getDate()) {
-      // Do not update state hook if the day didn't change
-      return;
-    }
-    setEndDate(date);
-  };
-
   return (
     <>
       <DatePickers
-        startDate={startDate}
-        endDate={endDate}
-        startChangeFunc={changeStartDate}
-        endChangeFunc={changeEndDate}
+        dates={dates}
+        changeDatesFnc={setDates}
       />
       <br />
       <div className="graphContainer">
