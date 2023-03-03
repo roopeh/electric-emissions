@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import {
   Chart as ChartJS, ChartData, CategoryScale, Legend, LinearScale, LineElement,
   PointElement, Title, Tooltip, ChartOptions, TimeScale, Plugin,
@@ -8,6 +8,7 @@ import { AnyObject } from "chart.js/dist/types/basic";
 import "chartjs-adapter-date-fns";
 import { Line } from "react-chartjs-2";
 import DatePickers from "./DatePickers";
+import emissionService from "../services/emissions";
 import { GraphDates, GraphDatasets, JsonData } from "../types";
 import "../styles/GraphChart.css";
 
@@ -31,19 +32,18 @@ const GraphChart = () => {
     consumed: new Array<JsonData>(),
     production: new Array<JsonData>(),
   });
+  const [errorText, setErrorText] = useState<String>("");
 
   useEffect(() => {
     const loadData = async () => {
+      setErrorText("");
       try {
-        const isoStartDate = dates.startDate.toISOString();
-        const isoEndDate = dates.endDate.toISOString();
-        const consumedResult = await axios.get(`http://localhost:3001/consumed/${isoStartDate}/${isoEndDate}`);
-        const productionResult = await axios.get(`http://localhost:3001/production/${isoStartDate}/${isoEndDate}`);
-        setGraphEmissions({ consumed: consumedResult.data, production: productionResult.data });
+        const consumedResult = await emissionService.getConsumedEmissions(dates);
+        const productionResult = await emissionService.getProductionEmissions(dates);
+        setGraphEmissions({ consumed: consumedResult, production: productionResult });
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
-          console.log(err.response?.status);
+          setErrorText(err.response?.data.error);
         }
       }
     };
@@ -112,6 +112,7 @@ const GraphChart = () => {
       x: {
         type: "time",
         bounds: "ticks",
+        offset: true,
         ticks: {
           major: {
             enabled: true,
@@ -121,6 +122,11 @@ const GraphChart = () => {
             if (tick) {
               const date = new Date(tick.value);
               if (tick.major && date.getHours() === 0) {
+                tick.label = date.toLocaleDateString("default", {
+                  day: "2-digit",
+                  month: "short",
+                });
+              } else if (date.getHours() === 0 && date.getMinutes() === 0) {
                 tick.label = date.toLocaleDateString("default", {
                   day: "2-digit",
                   month: "short",
@@ -216,6 +222,7 @@ const GraphChart = () => {
         changeDatesFnc={setDates}
       />
       <br />
+      {errorText}
       <div className="graphContainer">
         <Line options={options} data={chartData} plugins={chartPlugins} />
       </div>
