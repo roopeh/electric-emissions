@@ -23,8 +23,6 @@ export const validateDates = ({ startDateStr, endDateStr }: DateProps): Validate
     };
   }
   startDate.setHours(0, 0, 0, 0);
-  // Make sure to return last value of previous day by subtracting 4 minutes
-  startDate.setTime(startDate.getTime() - 4 * 60 * 1000);
   const endDate = new Date(endDateStr);
   if (!endDate.getTime()) {
     return {

@@ -53,6 +53,7 @@ const GraphChart = () => {
 
   const options: ChartOptions<"line"> = {
     responsive: true,
+    animation: false,
     interaction: {
       intersect: false,
       mode: "index",
@@ -112,21 +113,25 @@ const GraphChart = () => {
       x: {
         type: "time",
         bounds: "ticks",
-        offset: true,
         ticks: {
           major: {
             enabled: true,
           },
           font: ((ctx) => {
-            const { tick } = ctx;
+            const { tick, index } = ctx;
             if (tick) {
               const date = new Date(tick.value);
-              if (tick.major && date.getHours() === 0) {
+              if (index === 0 && (dates.startDate.getDate() === dates.endDate.getDate()
+                  && dates.startDate.getMonth() === dates.endDate.getMonth()
+                  && dates.startDate.getFullYear() === dates.endDate.getFullYear())) {
+                // Always show first tick for current day
+                tick.major = true;
                 tick.label = date.toLocaleDateString("default", {
                   day: "2-digit",
                   month: "short",
                 });
-              } else if (date.getHours() === 0 && date.getMinutes() === 0) {
+              } else if ((tick.major && date.getHours() === 0)
+                || (date.getHours() === 0 && date.getMinutes() === 0)) {
                 tick.label = date.toLocaleDateString("default", {
                   day: "2-digit",
                   month: "short",
