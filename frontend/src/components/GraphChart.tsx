@@ -7,6 +7,8 @@ import {
 import { AnyObject } from "chart.js/dist/types/basic";
 import "chartjs-adapter-date-fns";
 import { Line } from "react-chartjs-2";
+import Modal from "@mui/material/Modal";
+import CircularProgress from "@mui/material/CircularProgress";
 import DatePickers from "./DatePickers";
 import emissionService from "../services/emissions";
 import { GraphDates, GraphDatasets, JsonData } from "../types";
@@ -33,9 +35,11 @@ const GraphChart = () => {
     production: new Array<JsonData>(),
   });
   const [errorText, setErrorText] = useState<String>("");
+  const [loadingData, setLoadingData] = useState<boolean>(false);
 
   useEffect(() => {
     const loadData = async () => {
+      setLoadingData(true);
       setErrorText("");
       try {
         const consumedResult = await emissionService.getConsumedEmissions(dates);
@@ -46,6 +50,7 @@ const GraphChart = () => {
           setErrorText(err.response?.data.error);
         }
       }
+      setLoadingData(false);
     };
 
     loadData();
@@ -58,7 +63,6 @@ const GraphChart = () => {
       intersect: false,
       mode: "index",
     },
-    // spanGaps: true,
     scales: {
       y: {
         title: {
@@ -222,6 +226,15 @@ const GraphChart = () => {
 
   return (
     <>
+      <Modal
+        open={loadingData}
+        onClose={() => null}
+        hideBackdrop
+      >
+        <div className="graphLoadingModal">
+          <CircularProgress style={{ color: "darkgray" }} />
+        </div>
+      </Modal>
       <DatePickers
         dates={dates}
         changeDatesFnc={setDates}
