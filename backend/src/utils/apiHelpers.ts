@@ -54,6 +54,8 @@ export const handleApiError = ({ responseType, err }: ApiErrorProps): ApiErrorRe
       errMsg = "Time between start date and end date is too large";
     } else if (errCode === 422 || errCode === 400) {
       errMsg = "Invalid date values";
+    } else if (responseType === "current" && errCode === 500) {
+      errMsg = "Invalid parameters for current emissions";
     } else {
       errMsg = "Unknown error while fetching data";
       logError(`Unknown error with code ${errCode} while fetching ${responseType} data from api`);
