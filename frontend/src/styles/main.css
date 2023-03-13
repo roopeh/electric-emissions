@@ -1,3 +1,7 @@
+:root {
+  --defaultWidth: calc(min(max(65vw, 500px), 1000px));
+}
+
 .html, body {
   width: 100%;
   height: 100%;

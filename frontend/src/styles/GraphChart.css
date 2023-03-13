@@ -1,7 +1,3 @@
-:root {
-  --defaultWidth: calc(min(max(65vw, 500px), 1000px));
-}
-
 .graphContainer {
   display: flex;
   flex-direction: row;

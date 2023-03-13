@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GraphDates, JsonData } from "../types";
+import { CurrentEmissions, GraphDates, JsonData } from "../types";
 
 const apiUrl: string = "http://localhost:3001";
 
@@ -17,7 +17,13 @@ const getProductionEmissions = async (dates: GraphDates): Promise<Array<JsonData
   return response.data;
 };
 
+const getCurrentEmissions = async (): Promise<CurrentEmissions> => {
+  const response = await axios.get(`${apiUrl}/current`);
+  return response.data;
+};
+
 export default {
   getConsumedEmissions,
   getProductionEmissions,
+  getCurrentEmissions,
 };

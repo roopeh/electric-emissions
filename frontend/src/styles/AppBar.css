@@ -3,3 +3,45 @@
   height: 10vh;
   background-color: aliceblue;
 }
+
+.appBarContainer {
+  display: flex;
+  width: calc(var(--defaultWidth) - 8%);
+  height: 100%;
+  margin: 0 auto;
+}
+
+.appBarContainerBox {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  font-size: smaller;
+}
+
+.appBarEmissionValue {
+  font-size: large;
+  font-weight: 500;
+}
+
+.appBarConsumedFont {
+  color: red;
+}
+
+.appBarProductionFont {
+  color: green;
+}
+
+.appBarContainerText {
+  display: flex;
+  align-self: flex-end;
+  align-items: flex-end;
+  flex-direction: row;
+  font-size: small;
+}
+
+.appBarRefreshIcon {
+  width: 15px;
+  aspect-ratio: 1.0;
+}

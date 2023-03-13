@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { AxiosError } from "axios";
+import React from "react";
 import {
   Chart as ChartJS, ChartData, CategoryScale, Legend, LinearScale, LineElement,
   PointElement, Title, Tooltip, ChartOptions, TimeScale, Plugin,
@@ -10,8 +9,7 @@ import { Line } from "react-chartjs-2";
 import Modal from "@mui/material/Modal";
 import CircularProgress from "@mui/material/CircularProgress";
 import DatePickers from "./DatePickers";
-import emissionService from "../services/emissions";
-import { GraphDates, GraphDatasets, JsonData } from "../types";
+import { GraphDatasets, GraphDates } from "../types";
 import "../styles/GraphChart.css";
 
 ChartJS.register(
@@ -25,37 +23,17 @@ ChartJS.register(
   Legend,
 );
 
-const GraphChart = () => {
-  const [dates, setDates] = useState<GraphDates>({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
-  const [graphEmissions, setGraphEmissions] = useState<GraphDatasets>({
-    consumed: new Array<JsonData>(),
-    production: new Array<JsonData>(),
-  });
-  const [errorText, setErrorText] = useState<String>("");
-  const [loadingData, setLoadingData] = useState<boolean>(false);
+interface GraphChartProps {
+  graphEmissions: GraphDatasets,
+  dates: GraphDates,
+  datesFunc: (val: GraphDates) => void,
+  errorText: string,
+  isLoading: boolean,
+}
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoadingData(true);
-      setErrorText("");
-      try {
-        const consumedResult = await emissionService.getConsumedEmissions(dates);
-        const productionResult = await emissionService.getProductionEmissions(dates);
-        setGraphEmissions({ consumed: consumedResult, production: productionResult });
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          setErrorText(err.response?.data.error);
-        }
-      }
-      setLoadingData(false);
-    };
-
-    loadData();
-  }, [dates]);
-
+const GraphChart = ({
+  graphEmissions, dates, datesFunc, errorText, isLoading,
+}: GraphChartProps) => {
   const options: ChartOptions<"line"> = {
     responsive: true,
     animation: false,
@@ -227,7 +205,7 @@ const GraphChart = () => {
   return (
     <>
       <Modal
-        open={loadingData}
+        open={isLoading}
         onClose={() => null}
         hideBackdrop
       >
@@ -237,7 +215,7 @@ const GraphChart = () => {
       </Modal>
       <DatePickers
         dates={dates}
-        changeDatesFnc={setDates}
+        changeDatesFnc={datesFunc}
       />
       <br />
       {errorText}
