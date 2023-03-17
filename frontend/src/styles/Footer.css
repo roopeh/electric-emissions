@@ -1,0 +1,18 @@
+.footer {
+  flex: 1;
+  background-color: var(--defaultDarkBgColor);
+  margin-top: 50px;
+}
+
+.footerContent {
+  width: var(--defaultWidth);
+  margin: 0 auto;
+  padding-top: 15px;
+  color: white;
+}
+
+.footerContent p {
+  width: 97%;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}

@@ -16,5 +16,11 @@
   "datePicker7days": "Last 7 days",
   "datePicker14days": "Last 14 days",
   "datePicker30days": "Last 30 days",
-  "datePicker3months": "Last 3 months"
+  "datePicker3months": "Last 3 months",
+
+  "footerAbout": "About",
+  "footer1Par": "Within chart are shown near in real time calculated carbon dioxide emission estimate of electricity production in Finland and estimate of carbon dioxide of produced electricity, which is consumed in Finland.",
+  "footer2Par": "Emissions of electricity production are estimated by summing each product of different electricity production type and their emission factor together, and by dividing the sum by Finland's total electricity production.",
+  "footer3Par": "Emissions for electricity consumed are estimated by taking Finland's electricity production, electricity import as well as electricity export into account.",
+  "footer4Par": "In the top you may see emissions near in real time. Emission data is updated every 3 minutes at fingrid.fi"
 }

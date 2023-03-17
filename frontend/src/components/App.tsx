@@ -7,6 +7,7 @@ import {
   CurrentEmissions, GraphDatasets, GraphDates, JsonData, Locales,
 } from "../types";
 import "../styles/main.css";
+import Footer from "./Footer";
 
 const App = () => {
   const [currentEmissions, setCurrentEmissions] = useState<CurrentEmissions>({
@@ -78,7 +79,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="main">
       <AppBar
         currentEmissions={currentEmissions}
         refreshFunc={handleRefresh}
@@ -93,6 +94,7 @@ const App = () => {
         isLoading={loadingData}
         language={language}
       />
+      <Footer language={language} />
     </div>
   );
 };

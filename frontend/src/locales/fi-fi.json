@@ -16,5 +16,11 @@
   "datePicker7days": "Viimeiset 7 päivää",
   "datePicker14days": "Viimeiset 14 päivää",
   "datePicker30days": "Viimeiset 30 päivää",
-  "datePicker3months": "Viimeiset 3 kuukautta"
+  "datePicker3months": "Viimeiset 3 kuukautta",
+
+  "footerAbout": "Tietoa",
+  "footer1Par": "Kaaviossa on esitetty lähes reaaliajassa lasketut hiilidioksidipäästöarviot Suomen sähköntuotannosta ja arvio tuotetun sähkön hiilidioksidipäästöistä, joka kulutetaan Suomessa.",
+  "footer2Par": "Sähköntuotannon päästöt arvioidaan laskemalla yhteen eri sähköntuotantotyypin tuotteet ja niiden päästökertoimet, ja jakamalla summa Suomen sähkön kokonaistuotannolla.",
+  "footer3Par": "Kulutetun sähkön päästöt arvioidaan ottamalla huomioon Suomen sähköntuotanto, sähkön tuonti sekä sähkön vienti.",
+  "footer4Par": "Yläpalkissa voit nähdä päästöarvot lähes reaaliajassa. Päästötiedot päivitetään kerran 3 minuutissa fingrid.fi sivustolle."
 }
