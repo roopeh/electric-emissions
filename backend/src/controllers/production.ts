@@ -26,7 +26,7 @@ productionRouter.get("/:startDateStr/:endDateStr", async (req, res) => {
         `https://api.fingrid.fi/v1/variable/266/events/json?start_time=${isoStartDate}&end_time=${isoEndDate}`,
         {
           headers: {
-            "x-api-key": "",
+            "x-api-key": process.env.API_KEY,
           },
         },
       );
