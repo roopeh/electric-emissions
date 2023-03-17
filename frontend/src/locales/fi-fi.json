@@ -1,0 +1,20 @@
+{
+  "consumedEmission": "kulutetulle sähkölle",
+  "productionEmission": "tuotetulle sähkölle",
+
+  "appBarUpdatedAt": "Päivitetty klo ",
+  "appBarRefresh": "Päivitä",
+  "appBarCurrentEmissionVal": "Tämänhetkinen päästöarvo",
+
+  "graphChartLabel": "Päästöarvo",
+  "graphChartUnknownDate": "Tuntematon aika",
+  "graphChartConsumedDatasetLabel": "Kulutetun sähkön päästöarvo Suomessa",
+  "graphChartProductionDatasetLabel": "Tuotetun sähkön päästöarvo Suomessa",
+
+  "datePickerToday": "Tänään",
+  "datePicker3days": "Viimeiset 3 päivää",
+  "datePicker7days": "Viimeiset 7 päivää",
+  "datePicker14days": "Viimeiset 14 päivää",
+  "datePicker30days": "Viimeiset 30 päivää",
+  "datePicker3months": "Viimeiset 3 kuukautta"
+}

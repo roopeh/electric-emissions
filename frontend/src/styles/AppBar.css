@@ -33,15 +33,34 @@
   color: green;
 }
 
+.appBarRightContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.appBarFlagContainer {
+  display: flex;
+  justify-content: center;
+}
+
 .appBarContainerText {
   display: flex;
-  align-self: flex-end;
   align-items: flex-end;
-  flex-direction: row;
   font-size: small;
 }
 
 .appBarRefreshIcon {
   width: 15px;
   aspect-ratio: 1.0;
+}
+
+.appBarLocaleIcon {
+  width: 30px;
+  aspect-ratio: 1.5;
+}
+
+.appBarLocaleSelected {
+  border: 3px solid red;
 }

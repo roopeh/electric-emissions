@@ -4,7 +4,7 @@ import AppBar from "./AppBar";
 import GraphChart from "./GraphChart";
 import emissionService from "../services/emissions";
 import {
-  CurrentEmissions, GraphDatasets, GraphDates, JsonData,
+  CurrentEmissions, GraphDatasets, GraphDates, JsonData, Locales,
 } from "../types";
 import "../styles/main.css";
 
@@ -23,6 +23,7 @@ const App = () => {
   });
   const [errorText, setErrorText] = useState<string>("");
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [language, setLanguage] = useState<Locales>("en-gb");
 
   const getCurrentEmissions = async (): Promise<void> => {
     try {
@@ -78,13 +79,19 @@ const App = () => {
 
   return (
     <div>
-      <AppBar currentEmissions={currentEmissions} refreshFunc={handleRefresh} />
+      <AppBar
+        currentEmissions={currentEmissions}
+        refreshFunc={handleRefresh}
+        language={language}
+        languageFunc={setLanguage}
+      />
       <GraphChart
         graphEmissions={graphEmissions}
         dates={dates}
         datesFunc={setDates}
         errorText={errorText}
         isLoading={loadingData}
+        language={language}
       />
     </div>
   );

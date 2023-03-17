@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { GraphDates } from "../types";
+import localeHelper from "../util/localeHelper";
+import { GraphDates, Locales } from "../types";
 
 interface DatePickerProps {
   dates: GraphDates,
   changeDatesFnc: (dates: GraphDates) => void,
+  language: Locales,
 }
 
 interface PickerProps {
@@ -25,7 +27,7 @@ const DateEndPicker = ({ selectedValue, onChange }: PickerProps) => (
   </ReactDatePicker>
 );
 
-const DatePickers = ({ dates, changeDatesFnc }: DatePickerProps) => {
+const DatePickers = ({ dates, changeDatesFnc, language }: DatePickerProps) => {
   const validateStartDate = (date: Date): void => {
     const validDate = date > dates.endDate ? dates.endDate : date;
     if (validDate.getFullYear() === dates.startDate.getFullYear()
@@ -61,22 +63,22 @@ const DatePickers = ({ dates, changeDatesFnc }: DatePickerProps) => {
       </div>
       <div className="graphFixedDateContainer">
         <button type="button" onClick={() => chooseFixedLastDays(0)}>
-          Today
+          {localeHelper.getLocalizedString(language, "datePickerToday")}
         </button>
         <button type="button" onClick={() => chooseFixedLastDays(3)}>
-          Last 3 days
+          {localeHelper.getLocalizedString(language, "datePicker3days")}
         </button>
         <button type="button" onClick={() => chooseFixedLastDays(7)}>
-          Last 7 days
+          {localeHelper.getLocalizedString(language, "datePicker7days")}
         </button>
         <button type="button" onClick={() => chooseFixedLastDays(14)}>
-          Last 14 days
+          {localeHelper.getLocalizedString(language, "datePicker14days")}
         </button>
         <button type="button" onClick={() => chooseFixedLastDays(30)}>
-          Last 30 days
+          {localeHelper.getLocalizedString(language, "datePicker30days")}
         </button>
         <button type="button" onClick={() => chooseFixedLastDays(90)}>
-          Last 3 months
+          {localeHelper.getLocalizedString(language, "datePicker3months")}
         </button>
       </div>
     </div>

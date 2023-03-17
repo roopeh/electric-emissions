@@ -1,0 +1,20 @@
+{
+  "consumedEmission": "for electricity consumed",
+  "productionEmission": "of electricity production",
+
+  "appBarUpdatedAt": "Updated at",
+  "appBarRefresh": "Refresh",
+  "appBarCurrentEmissionVal": "Current emission value",
+
+  "graphChartLabel": "Emission factor",
+  "graphChartUnknownDate": "Unknown date",
+  "graphChartConsumedDatasetLabel": "Emission factor for electricity consumed in Finland",
+  "graphChartProductionDatasetLabel": "Emission factor of electricity production in Finland",
+
+  "datePickerToday": "Today",
+  "datePicker3days": "Last 3 days",
+  "datePicker7days": "Last 7 days",
+  "datePicker14days": "Last 14 days",
+  "datePicker30days": "Last 30 days",
+  "datePicker3months": "Last 3 months"
+}

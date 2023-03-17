@@ -9,7 +9,8 @@ import { Line } from "react-chartjs-2";
 import Modal from "@mui/material/Modal";
 import CircularProgress from "@mui/material/CircularProgress";
 import DatePickers from "./DatePickers";
-import { GraphDatasets, GraphDates } from "../types";
+import localeHelper from "../util/localeHelper";
+import { GraphDatasets, GraphDates, Locales } from "../types";
 import "../styles/GraphChart.css";
 
 ChartJS.register(
@@ -29,10 +30,11 @@ interface GraphChartProps {
   datesFunc: (val: GraphDates) => void,
   errorText: string,
   isLoading: boolean,
+  language: Locales,
 }
 
 const GraphChart = ({
-  graphEmissions, dates, datesFunc, errorText, isLoading,
+  graphEmissions, dates, datesFunc, errorText, isLoading, language,
 }: GraphChartProps) => {
   const options: ChartOptions<"line"> = {
     responsive: true,
@@ -108,18 +110,18 @@ const GraphChart = ({
                   && dates.startDate.getFullYear() === dates.endDate.getFullYear())) {
                 // Always show first tick for current day
                 tick.major = true;
-                tick.label = date.toLocaleDateString("default", {
+                tick.label = date.toLocaleDateString(language, {
                   day: "2-digit",
                   month: "short",
                 });
               } else if ((tick.major && date.getHours() === 0)
                 || (date.getHours() === 0 && date.getMinutes() === 0)) {
-                tick.label = date.toLocaleDateString("default", {
+                tick.label = date.toLocaleDateString(language, {
                   day: "2-digit",
                   month: "short",
                 });
               } else {
-                tick.label = date.toLocaleTimeString("default", {
+                tick.label = date.toLocaleTimeString(language, {
                   hour: "2-digit",
                   minute: "2-digit",
                 });
@@ -137,17 +139,17 @@ const GraphChart = ({
       tooltip: {
         callbacks: {
           label: (label) => (
-            `Emission factor ${label.datasetIndex === 0
-              ? "for electricity consumed"
-              : "of electricity production"
+            `${localeHelper.getLocalizedString(language, "graphChartLabel")} ${label.datasetIndex === 0
+              ? localeHelper.getLocalizedString(language, "consumedEmission")
+              : localeHelper.getLocalizedString(language, "productionEmission")
             }: ${label.formattedValue} g CO2 / kWh`
           ),
           title(tooltipItems) {
             const rawTime = tooltipItems.at(0)?.parsed.x;
             if (!rawTime) {
-              return "Unknown date";
+              return localeHelper.getLocalizedString(language, "graphChartUnknownDate");
             }
-            return new Date(rawTime).toLocaleDateString("default", {
+            return new Date(rawTime).toLocaleDateString(language, {
               weekday: "long",
               day: "2-digit",
               month: "short",
@@ -168,13 +170,13 @@ const GraphChart = ({
     labels: graphEmissions.consumed.map((itr) => itr.start_time),
     datasets: [
       {
-        label: "Emission factor for electricity consumed in Finland",
+        label: localeHelper.getLocalizedString(language, "graphChartConsumedDatasetLabel"),
         data: graphEmissions.consumed.map((itr) => itr.value),
         borderColor: "rgb(255, 99, 132)",
         pointRadius: 0,
       },
       {
-        label: "Emission factor of electricity production in Finland",
+        label: localeHelper.getLocalizedString(language, "graphChartProductionDatasetLabel"),
         data: graphEmissions.production.map((itr) => itr.value),
         borderColor: "rgb(99, 255, 132)",
         pointRadius: 0,
@@ -216,6 +218,7 @@ const GraphChart = ({
       <DatePickers
         dates={dates}
         changeDatesFnc={datesFunc}
+        language={language}
       />
       <br />
       {errorText}
