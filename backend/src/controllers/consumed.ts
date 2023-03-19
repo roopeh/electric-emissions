@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Router } from "express";
 import { handleApiError, validateDates } from "../utils/apiHelpers";
+import { API_KEY } from "../utils/config";
 
 const sampleConsumedData = require("../sampleData/consumed.json");
 
@@ -26,7 +27,7 @@ consumedRouter.get("/:startDateStr/:endDateStr", async (req, res) => {
         `https://api.fingrid.fi/v1/variable/265/events/json?start_time=${isoStartDate}&end_time=${isoEndDate}`,
         {
           headers: {
-            "x-api-key": process.env.API_KEY,
+            "x-api-key": API_KEY,
           },
         },
       );

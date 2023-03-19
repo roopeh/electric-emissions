@@ -8,12 +8,14 @@ import FinnishFlag from "../assets/locales/fi.png";
 import "../styles/AppBar.css";
 
 interface BuildEmissionsProps {
-  data: CurrentEmissionData,
+  data: CurrentEmissionData | undefined,
+  isConsumedEmissions: boolean,
   language: Locales,
 }
-const BuildCurrentEmissionValue = ({ data, language }: BuildEmissionsProps): JSX.Element => {
-  const isConsumed: boolean = data.variable_id === 265;
-  const fontClass: string = data.variable_id === 265
+const BuildCurrentEmissionValue = ({
+  data, isConsumedEmissions, language,
+}: BuildEmissionsProps): JSX.Element => {
+  const fontClass: string = isConsumedEmissions
     ? "appBarConsumedFont"
     : "appBarProductionFont";
 
@@ -22,13 +24,13 @@ const BuildCurrentEmissionValue = ({ data, language }: BuildEmissionsProps): JSX
       <span>
         {localeHelper.getLocalizedString(language, "appBarCurrentEmissionVal")}
         {" "}
-        {isConsumed
+        {isConsumedEmissions
           ? localeHelper.getLocalizedString(language, "consumedEmission")
           : localeHelper.getLocalizedString(language, "productionEmission")}
       </span>
       <div>
         <span className={`appBarEmissionValue ${fontClass}`}>
-          {data.value}
+          {data ? data.value : 0}
         </span>
         <span>
           {" "}
@@ -43,7 +45,7 @@ const BuildCurrentEmissionValue = ({ data, language }: BuildEmissionsProps): JSX
 };
 
 interface AppBarProps {
-  currentEmissions: CurrentEmissions,
+  currentEmissions: CurrentEmissions | undefined,
   refreshFunc: () => void,
   language: Locales,
   languageFunc: (val: Locales) => void,
@@ -51,19 +53,29 @@ interface AppBarProps {
 const AppBar = ({
   currentEmissions, refreshFunc, language, languageFunc,
 }: AppBarProps) => {
-  const dateValue = new Date(currentEmissions.consumed.start_time).toLocaleTimeString(
-    language,
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  );
+  const dateValue: string = !currentEmissions
+    ? "N/A"
+    : new Date(currentEmissions.consumed.start_time).toLocaleTimeString(
+      language,
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      },
+    );
 
   return (
     <div className="appBar">
       <div className="appBarContainer">
-        <BuildCurrentEmissionValue data={currentEmissions.consumed} language={language} />
-        <BuildCurrentEmissionValue data={currentEmissions.production} language={language} />
+        <BuildCurrentEmissionValue
+          data={currentEmissions?.consumed}
+          isConsumedEmissions
+          language={language}
+        />
+        <BuildCurrentEmissionValue
+          data={currentEmissions?.production}
+          isConsumedEmissions={false}
+          language={language}
+        />
         <div className="appBarRightContainer">
           <div className="appBarFlagContainer">
             <IconButton onClick={() => languageFunc("en-gb")}>

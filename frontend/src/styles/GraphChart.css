@@ -16,21 +16,24 @@
 
 .graphDatePickerContainer {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  margin: 1em 0;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: small;
+  font-size: 0.8rem;
 }
 
 .graphDatePicker {
-  margin: 0 5px;
+  margin: 0 1em;
 }
 
 .graphFixedDateContainer {
   display: flex;
+  flex-wrap: wrap;
   width: var(--defaultWidth);
+  max-width: var(--defaultWidth);
   margin: 0 auto;
   justify-content: center;
 }

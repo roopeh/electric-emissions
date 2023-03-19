@@ -2,6 +2,7 @@ import { Router } from "express";
 import axios from "axios";
 import { CurrentEmissionData, CurrentEmissions } from "../types";
 import { handleApiError } from "../utils/apiHelpers";
+import { API_KEY } from "../utils/config";
 
 const currentRouter = Router();
 
@@ -28,7 +29,7 @@ currentRouter.get("/", async (_req, res) => {
       "https://api.fingrid.fi/v1/variable/event/json/265,266",
       {
         headers: {
-          "x-api-key": process.env.API_KEY,
+          "x-api-key": API_KEY,
         },
       },
     );

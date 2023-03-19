@@ -6,11 +6,12 @@ import localeHelper from "../util/localeHelper";
 import { GraphDates, Locales } from "../types";
 
 const GraphButtonStyle: React.CSSProperties = {
+  marginBottom: "0.5em",
   backgroundColor: "#4d525678",
   borderTopLeftRadius: "0",
   borderTopRightRadius: "0",
   borderTop: "0",
-  fontSize: "11px",
+  fontSize: "0.7rem",
 };
 
 const CustomDatePickerNode = (

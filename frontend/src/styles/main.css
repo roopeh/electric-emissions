@@ -1,5 +1,5 @@
 :root {
-  --defaultWidth: calc(min(max(65vw, 500px), 1000px));
+  --defaultWidth: calc(min(max(65vw, 400px), 1000px));
   --defaultDarkBgColor: #4d5256a1;
 }
 
