@@ -1,4 +1,10 @@
+import { registerLocale } from "react-datepicker";
+import enGB from "date-fns/locale/en-GB";
+import fi from "date-fns/locale/fi";
 import { Locales } from "../types";
+
+registerLocale("en-gb", enGB);
+registerLocale("fi-fi", fi);
 
 // Use require instead of ES6 import so TypeScript won't interfere with types
 const englishStrings = require("../locales/en-gb.json");

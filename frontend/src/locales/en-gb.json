@@ -17,6 +17,7 @@
   "datePicker14days": "Last 14 days",
   "datePicker30days": "Last 30 days",
   "datePicker3months": "Last 3 months",
+  "datePickerCustom": "Or choose a custom date range",
 
   "footerAbout": "About",
   "footer1Par": "Within chart are shown near in real time calculated carbon dioxide emission estimate of electricity production in Finland and estimate of carbon dioxide of produced electricity, which is consumed in Finland.",

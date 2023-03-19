@@ -1,32 +1,76 @@
-import React from "react";
+import React, { ButtonHTMLAttributes } from "react";
+import Button from "@mui/material/Button";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import localeHelper from "../util/localeHelper";
 import { GraphDates, Locales } from "../types";
+
+const GraphButtonStyle: React.CSSProperties = {
+  backgroundColor: "#4d525678",
+  borderTopLeftRadius: "0",
+  borderTopRightRadius: "0",
+  borderTop: "0",
+  fontSize: "11px",
+};
+
+const CustomDatePickerNode = (
+  props: React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ref: React.Ref<HTMLButtonElement>,
+) => {
+  // eslint-disable-next-line react/prop-types
+  const { onClick, value } = props;
+  return (
+    <Button
+      variant="contained"
+      size="small"
+      onClick={onClick}
+      style={GraphButtonStyle}
+    >
+      {value}
+    </Button>
+  );
+};
+
+interface PickerProps {
+  selectedValue: Date,
+  onChange: (date: Date) => void,
+  language: Locales,
+}
+
+const CustomizedPickerInput = ({ selectedValue, onChange, language }: PickerProps) => (
+  <ReactDatePicker
+    selected={selectedValue}
+    dateFormat={language === "fi-fi" ? "dd.MM.yyyy" : "MM/dd/yyyy"}
+    locale={language}
+    onChange={onChange}
+    customInput={React.createElement(React.forwardRef(CustomDatePickerNode))}
+  />
+);
+
+interface DateButtonProps {
+  onClick: () => void,
+  text: string,
+}
+const DateButton = ({ onClick, text }: DateButtonProps) => (
+  <Button
+    variant="contained"
+    size="small"
+    onClick={onClick}
+    style={{
+      marginRight: "20px",
+      ...GraphButtonStyle,
+    }}
+  >
+    {text}
+  </Button>
+);
 
 interface DatePickerProps {
   dates: GraphDates,
   changeDatesFnc: (dates: GraphDates) => void,
   language: Locales,
 }
-
-interface PickerProps {
-  selectedValue: Date,
-  onChange: (date: Date) => void,
-}
-
-const DateStartPicker = ({ selectedValue, onChange }: PickerProps) => (
-  <ReactDatePicker selected={selectedValue} onChange={onChange}>
-    <div>start</div>
-  </ReactDatePicker>
-);
-
-const DateEndPicker = ({ selectedValue, onChange }: PickerProps) => (
-  <ReactDatePicker selected={selectedValue} onChange={onChange}>
-    <div>end</div>
-  </ReactDatePicker>
-);
-
 const DatePickers = ({ dates, changeDatesFnc, language }: DatePickerProps) => {
   const validateStartDate = (date: Date): void => {
     const validDate = date > dates.endDate ? dates.endDate : date;
@@ -57,29 +101,49 @@ const DatePickers = ({ dates, changeDatesFnc, language }: DatePickerProps) => {
 
   return (
     <div className="graphDateContainer">
-      <div className="graphDatePickers">
-        <div><DateStartPicker selectedValue={dates.startDate} onChange={validateStartDate} /></div>
-        <div><DateEndPicker selectedValue={dates.endDate} onChange={validateEndDate} /></div>
-      </div>
       <div className="graphFixedDateContainer">
-        <button type="button" onClick={() => chooseFixedLastDays(0)}>
-          {localeHelper.getLocalizedString(language, "datePickerToday")}
-        </button>
-        <button type="button" onClick={() => chooseFixedLastDays(3)}>
-          {localeHelper.getLocalizedString(language, "datePicker3days")}
-        </button>
-        <button type="button" onClick={() => chooseFixedLastDays(7)}>
-          {localeHelper.getLocalizedString(language, "datePicker7days")}
-        </button>
-        <button type="button" onClick={() => chooseFixedLastDays(14)}>
-          {localeHelper.getLocalizedString(language, "datePicker14days")}
-        </button>
-        <button type="button" onClick={() => chooseFixedLastDays(30)}>
-          {localeHelper.getLocalizedString(language, "datePicker30days")}
-        </button>
-        <button type="button" onClick={() => chooseFixedLastDays(90)}>
-          {localeHelper.getLocalizedString(language, "datePicker3months")}
-        </button>
+        <DateButton
+          onClick={() => chooseFixedLastDays(0)}
+          text={localeHelper.getLocalizedString(language, "datePickerToday")}
+        />
+        <DateButton
+          onClick={() => chooseFixedLastDays(3)}
+          text={localeHelper.getLocalizedString(language, "datePicker3days")}
+        />
+        <DateButton
+          onClick={() => chooseFixedLastDays(7)}
+          text={localeHelper.getLocalizedString(language, "datePicker7days")}
+        />
+        <DateButton
+          onClick={() => chooseFixedLastDays(14)}
+          text={localeHelper.getLocalizedString(language, "datePicker14days")}
+        />
+        <DateButton
+          onClick={() => chooseFixedLastDays(30)}
+          text={localeHelper.getLocalizedString(language, "datePicker30days")}
+        />
+        <DateButton
+          onClick={() => chooseFixedLastDays(90)}
+          text={localeHelper.getLocalizedString(language, "datePicker3months")}
+        />
+      </div>
+      <div className="graphDatePickerContainer">
+        <span>{`${localeHelper.getLocalizedString(language, "datePickerCustom")}:`}</span>
+        <div className="graphDatePicker">
+          <CustomizedPickerInput
+            selectedValue={dates.startDate}
+            onChange={validateStartDate}
+            language={language}
+          />
+        </div>
+        -
+        <div className="graphDatePicker">
+          <CustomizedPickerInput
+            selectedValue={dates.endDate}
+            onChange={validateEndDate}
+            language={language}
+          />
+        </div>
       </div>
     </div>
   );

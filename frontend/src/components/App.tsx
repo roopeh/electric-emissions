@@ -32,7 +32,11 @@ const App = () => {
       setCurrentEmissions(emissions);
     } catch (err) {
       if (err instanceof AxiosError) {
-        setErrorText(err.response?.data.error);
+        if (err.response) {
+          setErrorText(err.response.data.error);
+        } else {
+          setErrorText("Could not connect to server");
+        }
       }
     }
   };
@@ -51,7 +55,11 @@ const App = () => {
       setGraphEmissions({ consumed: consumedResult, production: productionResult });
     } catch (err) {
       if (err instanceof AxiosError) {
-        setErrorText(err.response?.data.error);
+        if (err.response) {
+          setErrorText(err.response.data.error);
+        } else {
+          setErrorText("Could not connect to server");
+        }
       }
     }
     setLoadingData(false);
@@ -67,13 +75,10 @@ const App = () => {
 
     const curDate = new Date();
 
-    // Refresh graph datasets only if user is viewing today's values
-    if ((curDate.getDate() === dates.startDate.getDate()
-    && curDate.getMonth() === dates.startDate.getMonth()
-    && curDate.getFullYear() === dates.startDate.getFullYear())
-    && (dates.startDate.getDate() === dates.endDate.getDate()
-    && dates.startDate.getMonth() === dates.endDate.getMonth()
-    && dates.startDate.getFullYear() === dates.endDate.getFullYear())) {
+    // Refresh graph datasets only if last selected day matches current day
+    if (curDate.getDate() === dates.endDate.getDate()
+    && curDate.getMonth() === dates.endDate.getMonth()
+    && curDate.getFullYear() === dates.endDate.getFullYear()) {
       loadGraphData();
     }
   };

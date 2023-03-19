@@ -45,6 +45,8 @@ const GraphChart = ({
     },
     scales: {
       y: {
+        // Begin at zero
+        min: 0,
         title: {
           display: true,
           text: "g CO2 / kWh",
@@ -62,11 +64,7 @@ const GraphChart = ({
         position: "left",
         afterDataLimits(scale) {
           // eslint-disable-next-line no-param-reassign
-          scale.max += 5;
-          if (scale.min >= 5) {
-            // eslint-disable-next-line no-param-reassign
-            scale.min -= 5;
-          }
+          scale.max += 10;
         },
       },
       y1: {
@@ -221,7 +219,9 @@ const GraphChart = ({
         language={language}
       />
       <br />
-      {errorText}
+      {errorText && errorText.length > 0 && (
+        <span className="errorText">{`Error: ${errorText}`}</span>
+      )}
       <div className="graphContainer">
         <Line options={options} data={chartData} plugins={chartPlugins} />
       </div>
