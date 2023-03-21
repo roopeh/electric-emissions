@@ -22,7 +22,7 @@ export const validateDates = ({ startDateStr, endDateStr }: DateProps): Validate
       isoEndDate: "null",
     };
   }
-  startDate.setHours(0, 0, 0, 0);
+
   const endDate = new Date(endDateStr);
   if (!endDate.getTime()) {
     return {
@@ -32,10 +32,9 @@ export const validateDates = ({ startDateStr, endDateStr }: DateProps): Validate
       isoEndDate: "null",
     };
   }
-  endDate.setHours(23, 59, 59);
 
-  const isoStartDate = `${startDate.toISOString().substring(0, 19)}Z`;
-  const isoEndDate = `${endDate.toISOString().substring(0, 19)}Z`;
+  const isoStartDate = `${startDateStr.substring(0, 19)}Z`;
+  const isoEndDate = `${endDateStr.substring(0, 19)}Z`;
   return {
     code: 200,
     message: "",

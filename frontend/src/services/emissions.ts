@@ -1,7 +1,9 @@
 import axios from "axios";
 import { CurrentEmissions, GraphDates, JsonData } from "../types";
 
-const apiUrl: string = "http://localhost:3001";
+const apiUrl: string = process.env.NODE_ENV === "production"
+  ? ""
+  : "http://localhost:3001";
 
 const getConsumedEmissions = async (dates: GraphDates): Promise<Array<JsonData>> => {
   const isoStartDate = dates.startDate.toISOString();

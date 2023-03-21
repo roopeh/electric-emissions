@@ -9,6 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static("build/frontend"));
+
 app.use("/current", currentRouter);
 app.use("/consumed", consumedRouter);
 app.use("/production", productionRouter);

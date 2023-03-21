@@ -50,6 +50,8 @@ const App = () => {
     setLoadingData(true);
     setErrorText("");
     try {
+      dates.startDate.setHours(0, 0, 0, 0);
+      dates.endDate.setHours(23, 59, 59);
       const consumedResult = await emissionService.getConsumedEmissions(dates);
       const productionResult = await emissionService.getProductionEmissions(dates);
       setGraphEmissions({ consumed: consumedResult, production: productionResult });
