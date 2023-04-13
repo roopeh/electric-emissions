@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="consumedEmissions">#FF6384</color>
+    <color name="productionEmissions">#63FF84</color>
 </resources>
