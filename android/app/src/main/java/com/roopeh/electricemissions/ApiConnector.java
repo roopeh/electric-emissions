@@ -1,20 +1,15 @@
 package com.roopeh.electricemissions;
 
 import android.content.Context;
-import android.text.format.DateFormat;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 public class ApiConnector {
     private static Gson gson = null;
@@ -26,11 +21,11 @@ public class ApiConnector {
         gson = new Gson();
     }
 
-    // Returns sample consumed emissions data in JSON from assets
-    public static ArrayList<EmissionEntry> getSampleConsumedData(Context context) {
+    // Returns sample emission data from provided file name in assets
+    public static ArrayList<EmissionEntry> getSampleDataFromFile(Context context, String fileName) {
         String rawJson = "";
         try {
-            final InputStream is = context.getAssets().open("sampleData/consumed.json");
+            final InputStream is = context.getAssets().open("sampleData/" + fileName);
             final int size = is.available();
             final byte[] buffer = new byte[size];
             is.read(buffer);
@@ -38,7 +33,7 @@ public class ApiConnector {
             rawJson = new String(buffer, StandardCharsets.UTF_8);
         } catch (IOException err) {
             err.printStackTrace();
-            return null;
+            return new ArrayList<>();
         }
 
         final Type typeToken = new TypeToken<ArrayList<RawEmissionEntry>>(){}.getType();

@@ -1,26 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tmpHello"
+    <!-- App bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/topBar">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:numColumns="3"
+            tools:ignore="UselessParent">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@color/white">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Current emission value for electricity consumed" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@color/white">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Current emission value of electricity production" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@color/white">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Test 3" />
+            </RelativeLayout>
+
+        </GridLayout>
+    </RelativeLayout>
+
+    <!-- Date pickers -->
+    <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
-        />
+        android:layout_marginTop="120dp"
+        >
+        <Button
+            android:id="@+id/buttonStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="Start date"
+            />
+        <Button
+            android:id="@+id/buttonEndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End date"
+            />
+    </GridLayout>
 
+    <!-- Chart -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/graphChart"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_below="@id/tmpHello"
+        android:layout_marginTop="200dp"
+        android:layout_centerHorizontal="true"
         />
-
 </RelativeLayout>
