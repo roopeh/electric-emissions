@@ -1,7 +1,7 @@
 package com.roopeh.electricemissions;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 
 public interface DatePickerInterface {
-    void onDateChanged(Calendar calendar, boolean isStartDate);
+    void onDateChanged(ZonedDateTime dateTime, boolean isStartDate);
 }

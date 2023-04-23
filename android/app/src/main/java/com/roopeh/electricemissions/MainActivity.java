@@ -12,23 +12,28 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements DatePickerInterface {
+        implements DatePickerInterface, ApiResponseInterface {
     private LineChart mGraphChart = null;
+    private LineDataSet mConsumedDataset = null;
+    private LineDataSet mProductionDataset = null;
+
     private Button mStartDateButton = null;
     private Button mEndDateButton = null;
-    private SimpleDateFormat mDateButtonFormatter = null;
+    private DateTimeFormatter mDateButtonFormatter = null;
 
-    private Calendar mStartDate = null;
-    private Calendar mEndDate= null;
+    private ZonedDateTime mStartDate = null;
+    private ZonedDateTime mEndDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +45,9 @@ public class MainActivity extends AppCompatActivity
         mEndDateButton = findViewById(R.id.buttonEndDate);
 
         // Initialize dates
-        mStartDate = Calendar.getInstance();
-        mEndDate = mStartDate;
-        mDateButtonFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+        mStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId());
+        mEndDate = LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId());
+        mDateButtonFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.ENGLISH);
         updateDateButtonTexts();
 
         // Initialize api connector
@@ -65,43 +70,27 @@ public class MainActivity extends AppCompatActivity
         chartMarker.setChartView(mGraphChart);
         mGraphChart.setMarker(chartMarker);
 
-        // Sample consumed data
-        final ArrayList<EmissionEntry> consumedData = ApiConnector.getSampleDataFromFile(getApplicationContext(), "consumed.json");
-        final ArrayList<Entry> consumedList = new ArrayList<>();
-        for (int i = 0; i < consumedData.size(); ++i) {
-            final EmissionEntry row = consumedData.get(i);
-            consumedList.add(new Entry(row.getUnixTime(), row.getValue()));
-        }
+        mConsumedDataset = new LineDataSet(new ArrayList<>(), "Consumed emissions");
+        mConsumedDataset.setDrawIcons(false);
+        mConsumedDataset.setColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
+        mConsumedDataset.setCircleColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
+        mConsumedDataset.setLineWidth(3f);
+        mConsumedDataset.setDrawCircleHole(false);
 
-        // Sample production data
-        final ArrayList<EmissionEntry> productionData = ApiConnector.getSampleDataFromFile(getApplicationContext(), "production.json");
-        final ArrayList<Entry> productionList = new ArrayList<>();
-        for (int i = 0; i < productionData.size(); ++i) {
-            final EmissionEntry row = productionData.get(i);
-            productionList.add(new Entry(row.getUnixTime(), row.getValue()));
-        }
-
-        final int forceLabelCount = Math.min(consumedData.size(), 15);
-        mGraphChart.getXAxis().setLabelCount(forceLabelCount, true);
-
-        final LineDataSet consumedDataset = new LineDataSet(consumedList, "Consumed emissions");
-        consumedDataset.setDrawIcons(false);
-        consumedDataset.setColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
-        consumedDataset.setCircleColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
-        consumedDataset.setLineWidth(3f);
-        consumedDataset.setDrawCircleHole(false);
-
-        final LineDataSet productionDataset = new LineDataSet(productionList, "Production emissions");
-        productionDataset.setDrawIcons(false);
-        productionDataset.setColor(getResources().getColor(R.color.productionEmissions, getTheme()));
-        productionDataset.setCircleColor(getResources().getColor(R.color.productionEmissions, getTheme()));
-        productionDataset.setLineWidth(3f);
-        productionDataset.setDrawCircleHole(false);
+        mProductionDataset = new LineDataSet(new ArrayList<>(), "Production emissions");
+        mProductionDataset.setDrawIcons(false);
+        mProductionDataset.setColor(getResources().getColor(R.color.productionEmissions, getTheme()));
+        mProductionDataset.setCircleColor(getResources().getColor(R.color.productionEmissions, getTheme()));
+        mProductionDataset.setLineWidth(3f);
+        mProductionDataset.setDrawCircleHole(false);
 
         final ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(consumedDataset);
-        dataSets.add(productionDataset);
+        dataSets.add(mConsumedDataset);
+        dataSets.add(mProductionDataset);
         mGraphChart.setData(new LineData(dataSets));
+
+        // Fetch initial data
+        fetchGraphData();
 
         // Date pickers listeners
         mStartDateButton.setOnClickListener(v -> showDatePickerDialog(true));
@@ -109,56 +98,80 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateDateButtonTexts() {
-        mStartDateButton.setText(mDateButtonFormatter.format(mStartDate.getTimeInMillis()));
-        mEndDateButton.setText(mDateButtonFormatter.format(mEndDate.getTimeInMillis()));
+        mStartDateButton.setText(mStartDate.format(mDateButtonFormatter));
+        mEndDateButton.setText(mEndDate.format(mDateButtonFormatter));
+    }
+
+    private void fetchGraphData() {
+        Log.d("DEBUG_TAG", "Fetching data");
+        if (ApiConnector.useSampleData) {
+            ApiConnector.getSampleDataFromFile(this, this, "consumed.json");
+            ApiConnector.getSampleDataFromFile(this, this, "production.json");
+        } else {
+            ApiConnector.loadConsumedData(this, mStartDate, mEndDate);
+            ApiConnector.loadProductionData(this, mStartDate, mEndDate);
+        }
     }
 
     private void showDatePickerDialog(boolean isStartDateButton) {
-        final Calendar calendar = isStartDateButton ? mStartDate : mEndDate;
-        final DialogFragment fragment = new DatePickerFragment(this, calendar, isStartDateButton);
+        final ZonedDateTime dateTime = isStartDateButton ? mStartDate : mEndDate;
+        final DialogFragment fragment = new DatePickerFragment(this, dateTime, isStartDateButton);
         fragment.show(getSupportFragmentManager(), "datePicker");
     }
 
-    private boolean isFirstDateSmallerThanSecond(Calendar c1, Calendar c2) {
-        return c1.get(Calendar.YEAR) <= c2.get(Calendar.YEAR)
-                && c1.get(Calendar.MONTH) <= c2.get(Calendar.MONTH)
-                && c1.get(Calendar.DAY_OF_MONTH) <= c2.get(Calendar.DAY_OF_MONTH)
-                && c1.get(Calendar.DAY_OF_MONTH) != c2.get(Calendar.DAY_OF_MONTH);
-    }
-
-    private boolean didDateChange(Calendar c1, Calendar c2) {
-        return c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR)
-                || c1.get(Calendar.MONTH) != c2.get(Calendar.MONTH)
-                || c1.get(Calendar.DAY_OF_MONTH) != c2.get(Calendar.DAY_OF_MONTH);
-    }
-
     @Override
-    public void onDateChanged(Calendar calendar, boolean isStartDate) {
+    public void onDateChanged(ZonedDateTime dateTime, boolean isStartDate) {
         final boolean didDateChange;
         if (isStartDate) {
-            final Calendar validDate = isFirstDateSmallerThanSecond(calendar, mEndDate)
-                    ? calendar
-                    : mEndDate;
-            didDateChange = didDateChange(validDate, mStartDate);
+            final ZonedDateTime validDate = (!dateTime.isAfter(mEndDate)
+                    ? dateTime
+                    : mEndDate)
+                        .withHour(0).withMinute(0).withSecond(0);
+            didDateChange = !validDate.equals(mStartDate);
             mStartDate = validDate;
-            // Set start time to midnight
-            mStartDate.set(Calendar.HOUR_OF_DAY, 0);
-            mStartDate.set(Calendar.MINUTE, 0);
         } else {
-            final Calendar validDate = isFirstDateSmallerThanSecond(mStartDate, calendar)
-                    ? calendar
-                    : mStartDate;
-            didDateChange = didDateChange(validDate, mEndDate);
+            final ZonedDateTime validDate = (!mStartDate.isAfter(dateTime)
+                    ? dateTime
+                    : mStartDate)
+                        .withHour(23).withMinute(59).withSecond(59);
+            didDateChange = !validDate.equals(mEndDate);
             mEndDate = validDate;
-            // Set end time to midnight
-            mEndDate.set(Calendar.HOUR_OF_DAY, 23);
-            mEndDate.set(Calendar.MINUTE, 59);
         }
 
         updateDateButtonTexts();
         // Fetch data from api only if dates changed
         if (didDateChange) {
-            Log.d("DEBUG_TAG", "date changed");
+            fetchGraphData();
         }
+    }
+
+    @Override
+    public void onResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<Entry> emissions) {
+        final int forceLabelCount;
+        switch (apiResponseType) {
+            case CONSUMED_EMISSIONS: {
+                mConsumedDataset.setValues(emissions);
+                forceLabelCount = Math.min(emissions.size(), 15);
+            } break;
+            case PRODUCTION_EMISSIONS: {
+                mProductionDataset.setValues(emissions);
+                forceLabelCount = Math.min(emissions.size(), 15);
+            } break;
+            default: {
+                forceLabelCount = 15;
+                break;
+            }
+        }
+
+        mGraphChart.getXAxis().setLabelCount(forceLabelCount, true);
+        mGraphChart.getData().notifyDataChanged();
+        mGraphChart.notifyDataSetChanged();
+        mGraphChart.invalidate();
+    }
+
+    @Override
+    public void onError(int errCode, String errMsg) {
+        // TODO: clear datasets on error?
+        Log.d("DEBUG_TAG", "Err code " + errCode + ": " + errMsg);
     }
 }
