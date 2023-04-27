@@ -23,7 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements DatePickerInterface, ApiResponseInterface {
+        implements DatePickerInterface, ApiResponseInterface, LoadingDialogInterface {
     private LineChart mGraphChart = null;
     private LineDataSet mConsumedDataset = null;
     private LineDataSet mProductionDataset = null;
@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity
 
     private ZonedDateTime mStartDate = null;
     private ZonedDateTime mEndDate = null;
+
+    private LoadingDialog mLoadingDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +113,25 @@ public class MainActivity extends AppCompatActivity
             ApiConnector.loadConsumedData(this, mStartDate, mEndDate);
             ApiConnector.loadProductionData(this, mStartDate, mEndDate);
         }
+
+        // Show loading dialog
+        toggleLoadingDialog(true);
+    }
+
+    private void toggleLoadingDialog(boolean toggle) {
+        if (toggle) {
+            if (mLoadingDialog == null) {
+                Log.d("DEBUG_TAG", "creating loading dialog");
+                mLoadingDialog = new LoadingDialog(this);
+                mLoadingDialog.setCancelable(false);
+                mLoadingDialog.show(getSupportFragmentManager(), "loadingDialog");
+            }
+        } else {
+            if (mLoadingDialog != null) {
+                mLoadingDialog.dismiss();
+                mLoadingDialog = null;
+            }
+        }
     }
 
     private void showDatePickerDialog(boolean isStartDateButton) {
@@ -146,7 +167,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<Entry> emissions) {
+    public void onApiResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<Entry> emissions) {
         final int forceLabelCount;
         switch (apiResponseType) {
             case CONSUMED_EMISSIONS: {
@@ -163,6 +184,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        toggleLoadingDialog(false);
+
         mGraphChart.getXAxis().setLabelCount(forceLabelCount, true);
         mGraphChart.getData().notifyDataChanged();
         mGraphChart.notifyDataSetChanged();
@@ -170,8 +193,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onError(int errCode, String errMsg) {
+    public void onApiError(int errCode, String errMsg) {
         // TODO: clear datasets on error?
+        toggleLoadingDialog(false);
         Log.d("DEBUG_TAG", "Err code " + errCode + ": " + errMsg);
+    }
+
+    @Override
+    public void onCancelLoadingDialog() {
+        toggleLoadingDialog(false);
     }
 }

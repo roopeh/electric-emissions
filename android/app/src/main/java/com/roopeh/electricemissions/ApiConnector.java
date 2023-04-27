@@ -51,9 +51,9 @@ public class ApiConnector {
             final byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
-            responseInterface.onResponse(responseType, parseEmissionsFromRawString(new String(buffer, StandardCharsets.UTF_8)));
+            responseInterface.onApiResponse(responseType, parseEmissionsFromRawString(new String(buffer, StandardCharsets.UTF_8)));
         } catch (IOException err) {
-            responseInterface.onError(500, "Unknown parse error when parsing data");
+            responseInterface.onApiError(500, "Unknown parse error when parsing data");
             err.printStackTrace();
         }
     }
@@ -68,10 +68,10 @@ public class ApiConnector {
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
                 final ArrayList<Entry> result = parseEmissionsFromRawString(response);
-                responseInterface.onResponse(ResponseTypes.CONSUMED_EMISSIONS, result);
+                responseInterface.onApiResponse(ResponseTypes.CONSUMED_EMISSIONS, result);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(error.networkResponse.statusCode);
-                responseInterface.onError(errBody.first, errBody.second);
+                responseInterface.onApiError(errBody.first, errBody.second);
                 error.printStackTrace();
         });
 
@@ -88,10 +88,10 @@ public class ApiConnector {
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
                 final ArrayList<Entry> result = parseEmissionsFromRawString(response);
-                responseInterface.onResponse(ResponseTypes.PRODUCTION_EMISSIONS, result);
+                responseInterface.onApiResponse(ResponseTypes.PRODUCTION_EMISSIONS, result);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(error.networkResponse.statusCode);
-                responseInterface.onError(errBody.first, errBody.second);
+                responseInterface.onApiError(errBody.first, errBody.second);
                 error.printStackTrace();
         });
 
