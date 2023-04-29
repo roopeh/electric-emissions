@@ -24,7 +24,8 @@ import java.util.Map;
 public class ApiConnector {
     public enum ResponseTypes {
         CONSUMED_EMISSIONS,
-        PRODUCTION_EMISSIONS
+        PRODUCTION_EMISSIONS,
+        CURRENT_EMISSIONS
     }
 
     private static Gson gson = null;
@@ -51,7 +52,7 @@ public class ApiConnector {
             final byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
-            responseInterface.onApiResponse(responseType, parseEmissionsFromRawString(new String(buffer, StandardCharsets.UTF_8)));
+            responseInterface.onApiResponse(responseType, parseRawEmissionsFromString(new String(buffer, StandardCharsets.UTF_8)));
         } catch (IOException err) {
             responseInterface.onApiError(500, "Unknown parse error when parsing data");
             err.printStackTrace();
@@ -67,10 +68,10 @@ public class ApiConnector {
                 + startDate.format(formatter) + "&end_time=" + endDate.format(formatter);
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
-                final ArrayList<Entry> result = parseEmissionsFromRawString(response);
+                final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
                 responseInterface.onApiResponse(ResponseTypes.CONSUMED_EMISSIONS, result);
             }, error -> {
-                final Pair<Integer, String> errBody = handleApiError(error.networkResponse.statusCode);
+                final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CONSUMED_EMISSIONS, error.networkResponse.statusCode);
                 responseInterface.onApiError(errBody.first, errBody.second);
                 error.printStackTrace();
         });
@@ -87,10 +88,10 @@ public class ApiConnector {
                 + startDate.format(formatter) + "&end_time=" + endDate.format(formatter);
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
-                final ArrayList<Entry> result = parseEmissionsFromRawString(response);
+                final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
                 responseInterface.onApiResponse(ResponseTypes.PRODUCTION_EMISSIONS, result);
             }, error -> {
-                final Pair<Integer, String> errBody = handleApiError(error.networkResponse.statusCode);
+                final Pair<Integer, String> errBody = handleApiError(ResponseTypes.PRODUCTION_EMISSIONS, error.networkResponse.statusCode);
                 responseInterface.onApiError(errBody.first, errBody.second);
                 error.printStackTrace();
         });
@@ -98,11 +99,22 @@ public class ApiConnector {
         ApplicationController.getInstance().addToRequestQueue(request);
     }
 
-    private static ArrayList<Entry> parseEmissionsFromRawString(String rawString) {
-        final Type typeToken = new TypeToken<ArrayList<RawEmissionEntry>>(){}.getType();
-        final ArrayList<RawEmissionEntry> rawEmissions = gson.fromJson(rawString, typeToken);
+    public static void loadCurrentData(ApiResponseInterface responseInterface) {
+        final String apiUrl = "https://api.fingrid.fi/v1/variable/event/json/265,266";
+        final ApiRequest request = new ApiRequest(apiUrl,
+            response -> {
+                final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
+                responseInterface.onApiResponse(ResponseTypes.CURRENT_EMISSIONS, result);
+            }, error -> {
+                final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CURRENT_EMISSIONS, error.networkResponse.statusCode);
+                responseInterface.onApiError(errBody.first, errBody.second);
+                error.printStackTrace();
+        });
 
-        // Parse raw JSON data
+        ApplicationController.getInstance().addToRequestQueue(request);
+    }
+
+    public static ArrayList<Entry> parseEntriesFromRawEmissions(ArrayList<RawEmissionEntry> rawEmissions) {
         final ArrayList<Entry> emissions = new ArrayList<>();
         for (int i = 0; i < rawEmissions.size(); ++i) {
             final EmissionEntry parsedEmission = new EmissionEntry(rawEmissions.get(i));
@@ -111,22 +123,23 @@ public class ApiConnector {
         return emissions;
     }
 
-    private static Pair<Integer, String> handleApiError(int errCode) {
+    private static ArrayList<RawEmissionEntry> parseRawEmissionsFromString(String rawString) {
+        final Type typeToken = new TypeToken<ArrayList<RawEmissionEntry>>(){}.getType();
+        return gson.fromJson(rawString, typeToken);
+    }
+
+    private static Pair<Integer, String> handleApiError(ResponseTypes responseType, int errCode) {
         final String errMsg;
-        switch (errCode) {
-            case 503:
-                errMsg = "Api is down for maintenance";
-                break;
-            case 416:
-                errMsg = "Time between start date and end date is too large";
-                break;
-            case 422:
-            case 400:
-                errMsg = "Invalid date values";
-                break;
-            default:
-                errMsg = "Unknown error while fetching data";
-                break;
+        if (errCode == 503) {
+            errMsg = "Api is down for maintenance";
+        } else if (errCode == 416) {
+            errMsg = "Time between start date and end date is too large";
+        } else if (errCode == 422 || errCode == 400) {
+            errMsg = "Invalid date values";
+        } else if (responseType == ResponseTypes.CURRENT_EMISSIONS && errCode == 500) {
+            errMsg = "Invalid parameters for current emissions";
+        } else {
+            errMsg = "Unknown error while fetching data";
         }
 
         return new Pair<>(errCode, errMsg);

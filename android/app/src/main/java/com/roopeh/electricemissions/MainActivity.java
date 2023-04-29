@@ -3,6 +3,7 @@ package com.roopeh.electricemissions;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -30,10 +31,13 @@ public class MainActivity extends AppCompatActivity
 
     private Button mStartDateButton = null;
     private Button mEndDateButton = null;
-    private DateTimeFormatter mDateButtonFormatter = null;
+
+    private TextView mCurrentConsumedVal = null;
+    private TextView mCurrentProductionVal = null;
 
     private ZonedDateTime mStartDate = null;
     private ZonedDateTime mEndDate = null;
+    private DateTimeFormatter mDateButtonFormatter = null;
 
     private LoadingDialog mLoadingDialog = null;
 
@@ -45,6 +49,8 @@ public class MainActivity extends AppCompatActivity
         mGraphChart = findViewById(R.id.graphChart);
         mStartDateButton = findViewById(R.id.buttonStartDate);
         mEndDateButton = findViewById(R.id.buttonEndDate);
+        mCurrentConsumedVal = findViewById(R.id.textConsumedValue);
+        mCurrentProductionVal = findViewById(R.id.textProductionValue);
 
         // Initialize dates
         mStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId());
@@ -93,6 +99,7 @@ public class MainActivity extends AppCompatActivity
 
         // Fetch initial data
         fetchGraphData();
+        ApiConnector.loadCurrentData(this);
 
         // Date pickers listeners
         mStartDateButton.setOnClickListener(v -> showDatePickerDialog(true));
@@ -121,7 +128,6 @@ public class MainActivity extends AppCompatActivity
     private void toggleLoadingDialog(boolean toggle) {
         if (toggle) {
             if (mLoadingDialog == null) {
-                Log.d("DEBUG_TAG", "creating loading dialog");
                 mLoadingDialog = new LoadingDialog(this);
                 mLoadingDialog.setCancelable(false);
                 mLoadingDialog.show(getSupportFragmentManager(), "loadingDialog");
@@ -167,21 +173,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onApiResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<Entry> emissions) {
+    public void onApiResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<RawEmissionEntry> rawEmissions) {
         final int forceLabelCount;
         switch (apiResponseType) {
-            case CONSUMED_EMISSIONS: {
-                mConsumedDataset.setValues(emissions);
-                forceLabelCount = Math.min(emissions.size(), 15);
-            } break;
+            case CONSUMED_EMISSIONS:
             case PRODUCTION_EMISSIONS: {
-                mProductionDataset.setValues(emissions);
+                final ArrayList<Entry> emissions = ApiConnector.parseEntriesFromRawEmissions(rawEmissions);
+                if (apiResponseType == ApiConnector.ResponseTypes.CONSUMED_EMISSIONS) {
+                    mConsumedDataset.setValues(emissions);
+                } else {
+                    mProductionDataset.setValues(emissions);
+                }
                 forceLabelCount = Math.min(emissions.size(), 15);
             } break;
+            // Current emissions
             default: {
                 forceLabelCount = 15;
-                break;
-            }
+                rawEmissions.forEach(e -> {
+                    if (e.getVariableId() == 265) {
+                        mCurrentConsumedVal.setText("" + e.getValue());
+                    } else {
+                        mCurrentProductionVal.setText("" + e.getValue());
+                    }
+                });
+            } break;
         }
 
         toggleLoadingDialog(false);
