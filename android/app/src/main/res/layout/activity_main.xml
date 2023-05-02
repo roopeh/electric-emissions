@@ -1,107 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
     <!-- App bar -->
-    <RelativeLayout
+    <androidx.constraintlayout.helper.widget.Flow
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@color/topBar">
+        android:layout_height="wrap_content"
+        android:background="@color/topBar"
+        android:paddingBottom="10dp"
+        app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,textView,flowConsumed,flowProduction"
+        app:flow_maxElementsWrap="3"
+        app:flow_horizontalGap="10dp"
+        app:flow_horizontalStyle="packed"
+        app:flow_verticalGap="10dp"
+        app:flow_verticalStyle="packed"
+        app:flow_wrapMode="aligned"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <GridLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:numColumns="3"
-            tools:ignore="UselessParent">
+    <TextView
+        android:id="@+id/textConsumedInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintWidth_max="120dp"
+        android:background="@color/white"
+        android:text="Current emission value for electricity consumed"
+        android:textSize="11sp" />
 
-            <RelativeLayout
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:background="@color/white">
-                <TextView
-                    android:id="@+id/textConsumedInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:text="Current emission value for electricity consumed" />
-                <TextView
-                    android:id="@+id/textConsumedValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/textConsumedInfo"
-                    android:textColor="@color/consumedEmissions"
-                    android:textSize="13sp"
-                    android:text="0" />
-            </RelativeLayout>
+    <TextView
+        android:id="@+id/textProductionInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintWidth_max="120dp"
+        android:background="@color/white"
+        android:text="Current emission value of electricity production"
+        android:textSize="11sp" />
 
-            <RelativeLayout
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:background="@color/white">
-                <TextView
-                    android:id="@+id/textProductionInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:text="Current emission value of electricity production" />
-                <TextView
-                    android:id="@+id/textProductionValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/textProductionInfo"
-                    android:textColor="@color/productionEmissions"
-                    android:textSize="13sp"
-                    android:text="0" />
-            </RelativeLayout>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintWidth_max="120dp"
+        android:background="@color/white"
+        android:text="Test 3"
+        android:textSize="11sp" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/white">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Test 3" />
-            </RelativeLayout>
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flowConsumed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintWidth_max="120dp"
+        app:flow_horizontalGap="5dp"
+        app:constraint_referenced_ids="textConsumedValue,textConsumedValueUnit" />
 
-        </GridLayout>
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/textConsumedValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:textColor="@color/consumedEmissions"
+        android:text="0"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/textConsumedValueUnit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textStart"
+        android:text="g CO2 / kWh"
+        android:textSize="10sp"
+        tools:ignore="SmallSp" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flowProduction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintWidth_percent="0.28"
+        app:layout_constraintWidth_max="120dp"
+        app:flow_horizontalGap="5dp"
+        app:constraint_referenced_ids="textProductionValue,textProductionValueUnit"
+        />
+
+    <TextView
+        android:id="@+id/textProductionValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:textColor="@color/productionEmissions"
+        android:text="0"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/textProductionValueUnit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textStart"
+        android:text="g CO2 / kWh"
+        android:textSize="10sp"
+        tools:ignore="SmallSp" />
 
     <!-- Date pickers -->
-    <GridLayout
+    <Button
+        android:id="@+id/buttonStartDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
-        >
-        <Button
-            android:id="@+id/buttonStartDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:text="Start date"
-            />
-        <Button
-            android:id="@+id/buttonEndDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="End date"
-            />
-    </GridLayout>
+        android:layout_marginStart="52dp"
+        android:layout_marginBottom="48dp"
+        android:text="Start date"
+        app:layout_constraintBottom_toTopOf="@+id/graphChart"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="48dp"
+        android:text="End date"
+        app:layout_constraintBottom_toTopOf="@+id/graphChart"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Chart -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/graphChart"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="200dp"
         android:layout_centerHorizontal="true"
-        />
-</RelativeLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
