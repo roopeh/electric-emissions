@@ -52,6 +52,14 @@ public class MainActivity extends AppCompatActivity
         mCurrentConsumedVal = findViewById(R.id.textConsumedValue);
         mCurrentProductionVal = findViewById(R.id.textProductionValue);
 
+        // Fixed date buttons
+        final Button mButtonFixedToday = findViewById(R.id.buttonFixedToday);
+        final Button mButtonFixed3days = findViewById(R.id.buttonFixed3days);
+        final Button mButtonFixed7days = findViewById(R.id.buttonFixed7days);
+        final Button mButtonFixed14days = findViewById(R.id.buttonFixed14days);
+        final Button mButtonFixed30days = findViewById(R.id.buttonFixed30days);
+        final Button mButtonFixed90days = findViewById(R.id.buttonFixed90days);
+
         // Initialize dates
         mStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId());
         mEndDate = LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId());
@@ -104,6 +112,39 @@ public class MainActivity extends AppCompatActivity
         // Date pickers listeners
         mStartDateButton.setOnClickListener(v -> showDatePickerDialog(true));
         mEndDateButton.setOnClickListener(v -> showDatePickerDialog(false));
+
+        // Fixed date buttons
+        mButtonFixedToday.setOnClickListener(v -> chooseFixedLastDays(0));
+        mButtonFixed3days.setOnClickListener(v -> chooseFixedLastDays(3));
+        mButtonFixed7days.setOnClickListener(v -> chooseFixedLastDays(7));
+        mButtonFixed14days.setOnClickListener(v -> chooseFixedLastDays(14));
+        mButtonFixed30days.setOnClickListener(v -> chooseFixedLastDays(30));
+        mButtonFixed90days.setOnClickListener(v -> chooseFixedLastDays(90));
+    }
+
+    private void updateDate(ZonedDateTime dateTime, boolean isStartDate) {
+        final boolean didDateChange;
+        if (isStartDate) {
+            final ZonedDateTime validDate = (!dateTime.isAfter(mEndDate)
+                    ? dateTime
+                    : mEndDate)
+                    .withHour(0).withMinute(0).withSecond(0);
+            didDateChange = !validDate.equals(mStartDate);
+            mStartDate = validDate;
+        } else {
+            final ZonedDateTime validDate = (!mStartDate.isAfter(dateTime)
+                    ? dateTime
+                    : mStartDate)
+                    .withHour(23).withMinute(59).withSecond(59);
+            didDateChange = !validDate.equals(mEndDate);
+            mEndDate = validDate;
+        }
+
+        updateDateButtonTexts();
+        // Fetch data from api only if dates changed
+        if (didDateChange) {
+            fetchGraphData();
+        }
     }
 
     private void updateDateButtonTexts() {
@@ -140,6 +181,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void chooseFixedLastDays(int days) {
+        mEndDate = LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId());
+        final ZonedDateTime newStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId())
+                .minusDays(days);
+
+        updateDate(newStartDate, true);
+    }
+
     private void showDatePickerDialog(boolean isStartDateButton) {
         final ZonedDateTime dateTime = isStartDateButton ? mStartDate : mEndDate;
         final DialogFragment fragment = new DatePickerFragment(this, dateTime, isStartDateButton);
@@ -148,28 +197,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDateChanged(ZonedDateTime dateTime, boolean isStartDate) {
-        final boolean didDateChange;
-        if (isStartDate) {
-            final ZonedDateTime validDate = (!dateTime.isAfter(mEndDate)
-                    ? dateTime
-                    : mEndDate)
-                        .withHour(0).withMinute(0).withSecond(0);
-            didDateChange = !validDate.equals(mStartDate);
-            mStartDate = validDate;
-        } else {
-            final ZonedDateTime validDate = (!mStartDate.isAfter(dateTime)
-                    ? dateTime
-                    : mStartDate)
-                        .withHour(23).withMinute(59).withSecond(59);
-            didDateChange = !validDate.equals(mEndDate);
-            mEndDate = validDate;
-        }
-
-        updateDateButtonTexts();
-        // Fetch data from api only if dates changed
-        if (didDateChange) {
-            fetchGraphData();
-        }
+        updateDate(dateTime, isStartDate);
     }
 
     @Override

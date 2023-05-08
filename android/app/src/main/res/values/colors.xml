@@ -10,5 +10,6 @@
 
     <color name="consumedEmissions">#FF6384</color>
     <color name="productionEmissions">#63FF84</color>
-    <color name="topBar">#4d5256a1</color>
+    <color name="topBar">#788087</color>
+    <color name="buttonColor">#a0a6ab</color>
 </resources>
