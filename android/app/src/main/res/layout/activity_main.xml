@@ -19,7 +19,7 @@
             android:background="@color/topBar"
             android:paddingTop="5dp"
             android:paddingBottom="10dp"
-            app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,textView,flowConsumed,flowProduction,textRefresh"
+            app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,textView,flowConsumed,flowProduction,buttonRefresh"
             app:flow_maxElementsWrap="3"
             app:flow_horizontalGap="10dp"
             app:flow_horizontalStyle="packed"
@@ -116,16 +116,15 @@
             android:textSize="10sp"
             tools:ignore="SmallSp" />
 
-        <TextView
-            android:id="@+id/textRefresh"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonRefresh"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintWidth_percent="0.15"
             app:layout_constraintWidth_max="120dp"
-            android:text="Updated at 21:10"
-            android:textColor="@color/white"
-            android:textSize="11sp"
-            />
+            android:text="N/A"
+            android:textAllCaps="false"
+            style="@style/AppButtonTheme" />
 
         <!-- Fixed date buttons -->
         <androidx.constraintlayout.helper.widget.Flow

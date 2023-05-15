@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView mCurrentConsumedVal = null;
     private TextView mCurrentProductionVal = null;
+    private Button mRefreshEmissionsButton = null;
 
     private ZonedDateTime mStartDate = null;
     private ZonedDateTime mEndDate = null;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity
         mEndDateButton = findViewById(R.id.buttonEndDate);
         mCurrentConsumedVal = findViewById(R.id.textConsumedValue);
         mCurrentProductionVal = findViewById(R.id.textProductionValue);
+        mRefreshEmissionsButton = findViewById(R.id.buttonRefresh);
 
         // Fixed date buttons
         final Button mButtonFixedToday = findViewById(R.id.buttonFixedToday);
@@ -107,7 +109,9 @@ public class MainActivity extends AppCompatActivity
 
         // Fetch initial data
         fetchGraphData();
-        ApiConnector.loadCurrentData(this);
+        ApiConnector.loadCurrentData(this, true);
+
+        mRefreshEmissionsButton.setOnClickListener(v -> ApiConnector.loadCurrentData(this, false));
 
         // Date pickers listeners
         mStartDateButton.setOnClickListener(v -> showDatePickerDialog(true));
@@ -153,7 +157,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void fetchGraphData() {
-        Log.d("DEBUG_TAG", "Fetching data");
         if (ApiConnector.useSampleData) {
             ApiConnector.getSampleDataFromFile(this, this, "consumed.json");
             ApiConnector.getSampleDataFromFile(this, this, "production.json");
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onApiResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<RawEmissionEntry> rawEmissions) {
+    public void onApiResponse(ApiConnector.ResponseTypes apiResponseType, ArrayList<RawEmissionEntry> rawEmissions, boolean isCached) {
         final int forceLabelCount;
         switch (apiResponseType) {
             case CONSUMED_EMISSIONS:
@@ -216,7 +219,12 @@ public class MainActivity extends AppCompatActivity
             } break;
             // Current emissions
             default: {
-                forceLabelCount = 15;
+                // Update last updated time
+                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                final ZonedDateTime lastRefreshTime = ZonedDateTime.parse(rawEmissions.get(0).getStartTime(), formatter);
+                mRefreshEmissionsButton.setText("Updated at " + lastRefreshTime.getHour() + ":" + lastRefreshTime.getMinute());
+
+                // Set current emissions
                 rawEmissions.forEach(e -> {
                     if (e.getVariableId() == 265) {
                         mCurrentConsumedVal.setText("" + e.getValue());
@@ -224,7 +232,17 @@ public class MainActivity extends AppCompatActivity
                         mCurrentProductionVal.setText("" + e.getValue());
                     }
                 });
-            } break;
+
+                // Refresh graph datasets if last selected day matches current day and if new values were fetched
+                if (!isCached) {
+                    final ZonedDateTime curDate = ZonedDateTime.now();
+                    if (curDate.getDayOfMonth() == mEndDate.getDayOfMonth()
+                            && curDate.getMonth() == mEndDate.getMonth()
+                            && curDate.getYear() == mEndDate.getYear()) {
+                        fetchGraphData();
+                    }
+                }
+            } return;
         }
 
         toggleLoadingDialog(false);

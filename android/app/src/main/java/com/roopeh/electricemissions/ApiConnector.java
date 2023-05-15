@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,10 @@ public class ApiConnector {
     }
 
     private static Gson gson = null;
+
+    // Cached current emissions
+    private static ZonedDateTime mLastRefreshTime = null;
+    private static ArrayList<RawEmissionEntry> mLastCachedCurrentEmissions = null;
 
     // For debugging
     final public static boolean useSampleData = false;
@@ -52,7 +57,7 @@ public class ApiConnector {
             final byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
-            responseInterface.onApiResponse(responseType, parseRawEmissionsFromString(new String(buffer, StandardCharsets.UTF_8)));
+            responseInterface.onApiResponse(responseType, parseRawEmissionsFromString(new String(buffer, StandardCharsets.UTF_8)), false);
         } catch (IOException err) {
             responseInterface.onApiError(500, "Unknown parse error when parsing data");
             err.printStackTrace();
@@ -69,7 +74,7 @@ public class ApiConnector {
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
                 final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
-                responseInterface.onApiResponse(ResponseTypes.CONSUMED_EMISSIONS, result);
+                responseInterface.onApiResponse(ResponseTypes.CONSUMED_EMISSIONS, result, false);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CONSUMED_EMISSIONS, error.networkResponse.statusCode);
                 responseInterface.onApiError(errBody.first, errBody.second);
@@ -89,7 +94,7 @@ public class ApiConnector {
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
                 final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
-                responseInterface.onApiResponse(ResponseTypes.PRODUCTION_EMISSIONS, result);
+                responseInterface.onApiResponse(ResponseTypes.PRODUCTION_EMISSIONS, result, false);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.PRODUCTION_EMISSIONS, error.networkResponse.statusCode);
                 responseInterface.onApiError(errBody.first, errBody.second);
@@ -99,12 +104,28 @@ public class ApiConnector {
         ApplicationController.getInstance().addToRequestQueue(request);
     }
 
-    public static void loadCurrentData(ApiResponseInterface responseInterface) {
+    public static void loadCurrentData(ApiResponseInterface responseInterface, boolean initialLoad) {
+        final ZonedDateTime curDate = ZonedDateTime.now();
+
+        // Get new current emission values every 1 minutes
+        // otherwise return cached values
+        if (mLastRefreshTime != null) {
+            final Duration duration = Duration.between(curDate, mLastRefreshTime).abs();
+            if (duration.getSeconds() < 60) {
+                responseInterface.onApiResponse(ResponseTypes.CURRENT_EMISSIONS, mLastCachedCurrentEmissions, true);
+                return;
+            }
+        }
+
+        mLastRefreshTime = curDate;
+
         final String apiUrl = "https://api.fingrid.fi/v1/variable/event/json/265,266";
         final ApiRequest request = new ApiRequest(apiUrl,
             response -> {
                 final ArrayList<RawEmissionEntry> result = parseRawEmissionsFromString(response);
-                responseInterface.onApiResponse(ResponseTypes.CURRENT_EMISSIONS, result);
+                mLastCachedCurrentEmissions = result;
+                // Tell MainActivity it's a cached value on initial load to prevent double API fetch
+                responseInterface.onApiResponse(ResponseTypes.CURRENT_EMISSIONS, result, initialLoad);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CURRENT_EMISSIONS, error.networkResponse.statusCode);
                 responseInterface.onApiError(errBody.first, errBody.second);
