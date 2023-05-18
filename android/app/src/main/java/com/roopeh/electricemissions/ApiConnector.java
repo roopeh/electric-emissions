@@ -64,10 +64,11 @@ public class ApiConnector {
         }
     }
 
-    public static void loadConsumedData(ApiResponseInterface responseInterface, ZonedDateTime startDate, ZonedDateTime endDate) {
+    public static void loadConsumedData(ApiResponseInterface responseInterface) {
         // Change timezone to GMt+0 to match API timezone
-        startDate = startDate.withZoneSameInstant(ZoneId.of("GMT+0"));
-        endDate = endDate.withZoneSameInstant(ZoneId.of("GMT+0"));
+        final ZonedDateTime startDate = LocalStore.getInstance().getStartDate().withZoneSameInstant(ZoneId.of("GMT+0"));
+        final ZonedDateTime endDate = LocalStore.getInstance().getEndDate().withZoneSameInstant(ZoneId.of("GMT+0"));
+
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
         final String apiUrl = "https://api.fingrid.fi/v1/variable/265/events/json?start_time="
                 + startDate.format(formatter) + "&end_time=" + endDate.format(formatter);
@@ -84,10 +85,11 @@ public class ApiConnector {
         ApplicationController.getInstance().addToRequestQueue(request);
     }
 
-    public static void loadProductionData(ApiResponseInterface responseInterface, ZonedDateTime startDate, ZonedDateTime endDate) {
+    public static void loadProductionData(ApiResponseInterface responseInterface) {
         // Change timezone to GMt+0 to match API timezone
-        startDate = startDate.withZoneSameInstant(ZoneId.of("GMT+0"));
-        endDate = endDate.withZoneSameInstant(ZoneId.of("GMT+0"));
+        final ZonedDateTime startDate = LocalStore.getInstance().getStartDate().withZoneSameInstant(ZoneId.of("GMT+0"));
+        final ZonedDateTime endDate = LocalStore.getInstance().getEndDate().withZoneSameInstant(ZoneId.of("GMT+0"));
+
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
         final String apiUrl = "https://api.fingrid.fi/v1/variable/266/events/json?start_time="
                 + startDate.format(formatter) + "&end_time=" + endDate.format(formatter);

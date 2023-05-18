@@ -1,3 +1,30 @@
 <resources>
-    <string name="app_name">ElectricEmissions</string>
+    <!-- Constants -->
+    <string name="app_name" translatable="false">ElectricEmissions</string>
+    <string name="emissionUnit" translatable="false">g CO2 / kWh</string>
+    <string name="currentEmissionValue" translatable="false">0</string>
+    <string name="unknownTime" translatable="false">N/A</string>
+    <string name="dateDash" translatable="false">-</string>
+
+    <!-- App bar -->
+    <string name="currentConsumedInfo">Current emission value for electricity consumed</string>
+    <string name="currentProductionInfo">Current emission value of electricity production</string>
+    <string name="currentUpdatedAt">Updated at %1$02d:%2$02d</string>
+    <string name="changeLocaleGb">Change language to English</string>
+    <string name="changeLocaleFi">Change language to Finnish</string>
+
+    <!-- Fixed date buttons -->
+    <string name="fixedDateToday">Today</string>
+    <string name="fixedDate3days">Last 3 days</string>
+    <string name="fixedDate7days">Last 7 days</string>
+    <string name="fixedDate14days">Last 14 days</string>
+    <string name="fixedDate30days">Last 30 days</string>
+    <string name="fixedDate3months">Last 3 months</string>
+
+    <!-- Date pickers -->
+    <string name="chooseCustomDate">Or choose a custom date range:</string>
+
+    <!-- Chart -->
+    <string name="consumedEmissions">Emission factor for electricity consumed in Finland</string>
+    <string name="productionEmissions">Emission factor of electricity produced in Finland</string>
 </resources>

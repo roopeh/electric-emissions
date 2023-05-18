@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App bar -->
+    <string name="currentConsumedInfo">Tämänhetkinen päästöarvo kulutetulle sähkölle</string>
+    <string name="currentProductionInfo">Tämänhetkinen päästöarvo tuotetulle sähkölle</string>
+    <string name="currentUpdatedAt">Päivitetty klo %1$02d:%2$02d</string>
+    <string name="changeLocaleGb">Vaihda kieli englantiin</string>
+    <string name="changeLocaleFi">Vaihda kieli suomeen</string>
+
+    <!-- Fixed date buttons -->
+    <string name="fixedDateToday">Tänään</string>
+    <string name="fixedDate3days">Viimeiset 3 päivää</string>
+    <string name="fixedDate7days">Viimeiset 7 päivää</string>
+    <string name="fixedDate14days">Viimeiset 14 päivää</string>
+    <string name="fixedDate30days">Viimeiset 30 päivää</string>
+    <string name="fixedDate3months">Viimeiset 3 kuukautta</string>
+
+    <!-- Date pickers -->
+    <string name="chooseCustomDate">Tai valitse aikaväli itse:</string>
+
+    <!-- Chart -->
+    <string name="consumedEmissions">Kulutetun sähkön päästöarvo Suomessa</string>
+    <string name="productionEmissions">Tuotetun sähkön päästöarvo Suomessa</string>
+</resources>

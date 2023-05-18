@@ -1,8 +1,10 @@
 package com.roopeh.electricemissions;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity
     private LineChart mGraphChart = null;
     private LineDataSet mConsumedDataset = null;
     private LineDataSet mProductionDataset = null;
+    private ArrayList<Entry> mConsumedEmissions = null;
+    private ArrayList<Entry> mProductionEmissions = null;
 
     private Button mStartDateButton = null;
     private Button mEndDateButton = null;
@@ -36,8 +41,8 @@ public class MainActivity extends AppCompatActivity
     private TextView mCurrentProductionVal = null;
     private Button mRefreshEmissionsButton = null;
 
-    private ZonedDateTime mStartDate = null;
-    private ZonedDateTime mEndDate = null;
+    final private Locale mFinnishLocale = new Locale("fi", "FI");
+
     private DateTimeFormatter mDateButtonFormatter = null;
 
     private LoadingDialog mLoadingDialog = null;
@@ -54,6 +59,21 @@ public class MainActivity extends AppCompatActivity
         mCurrentProductionVal = findViewById(R.id.textProductionValue);
         mRefreshEmissionsButton = findViewById(R.id.buttonRefresh);
 
+        mConsumedEmissions = new ArrayList<>();
+        mProductionEmissions = new ArrayList<>();
+
+        // Load saved graph emissions
+        if (savedInstanceState != null) {
+            final ArrayList<Entry> consumedEmissions = savedInstanceState.getParcelableArrayList("consumedData", Entry.class);
+            if (consumedEmissions != null) {
+                mConsumedEmissions = consumedEmissions;
+            }
+            final ArrayList<Entry> productionEmissions = savedInstanceState.getParcelableArrayList("productionData", Entry.class);
+            if (productionEmissions != null) {
+                mProductionEmissions = productionEmissions;
+            }
+        }
+
         // Fixed date buttons
         final Button mButtonFixedToday = findViewById(R.id.buttonFixedToday);
         final Button mButtonFixed3days = findViewById(R.id.buttonFixed3days);
@@ -62,10 +82,21 @@ public class MainActivity extends AppCompatActivity
         final Button mButtonFixed30days = findViewById(R.id.buttonFixed30days);
         final Button mButtonFixed90days = findViewById(R.id.buttonFixed90days);
 
-        // Initialize dates
-        mStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId());
-        mEndDate = LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId());
-        mDateButtonFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.ENGLISH);
+        // Locale buttons
+        final ImageButton mEnglishButton = findViewById(R.id.buttonLocaleGb);
+        final ImageButton mFinnishButton = findViewById(R.id.buttonLocaleFi);
+
+        // Set selected locale
+        final Locale selectedLocale = LocalStore.getInstance().getSelectedLanguage();
+        if (selectedLocale == Locale.ENGLISH) {
+            mEnglishButton.setBackgroundResource(R.drawable.bordered_box);
+        } else if (selectedLocale.getCountry().equalsIgnoreCase("FI")) {
+            mFinnishButton.setBackgroundResource(R.drawable.bordered_box);
+        }
+
+        // Initialize date pickers
+        final String datePickerPattern = selectedLocale == Locale.ENGLISH ? "MM/dd/yyyy" : "dd.MM.yyyy";
+        mDateButtonFormatter = DateTimeFormatter.ofPattern(datePickerPattern, selectedLocale);
         updateDateButtonTexts();
 
         // Initialize api connector
@@ -82,20 +113,21 @@ public class MainActivity extends AppCompatActivity
         mGraphChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         mGraphChart.getXAxis().setLabelRotationAngle(-50f);
         mGraphChart.getXAxis().setValueFormatter(new ChartXAxisDateConverter());
+        mGraphChart.getXAxis().setLabelCount(Math.min(mConsumedEmissions.size(), 15), true);
 
         // Apply a custom marker
         final ChartMarker chartMarker = new ChartMarker(getApplicationContext(), R.layout.chart_marker_view);
         chartMarker.setChartView(mGraphChart);
         mGraphChart.setMarker(chartMarker);
 
-        mConsumedDataset = new LineDataSet(new ArrayList<>(), "Consumed emissions");
+        mConsumedDataset = new LineDataSet(mConsumedEmissions, getResources().getString(R.string.consumedEmissions));
         mConsumedDataset.setDrawIcons(false);
         mConsumedDataset.setColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
         mConsumedDataset.setCircleColor(getResources().getColor(R.color.consumedEmissions, getTheme()));
         mConsumedDataset.setLineWidth(3f);
         mConsumedDataset.setDrawCircleHole(false);
 
-        mProductionDataset = new LineDataSet(new ArrayList<>(), "Production emissions");
+        mProductionDataset = new LineDataSet(mProductionEmissions, getResources().getString(R.string.productionEmissions));
         mProductionDataset.setDrawIcons(false);
         mProductionDataset.setColor(getResources().getColor(R.color.productionEmissions, getTheme()));
         mProductionDataset.setCircleColor(getResources().getColor(R.color.productionEmissions, getTheme()));
@@ -108,8 +140,10 @@ public class MainActivity extends AppCompatActivity
         mGraphChart.setData(new LineData(dataSets));
 
         // Fetch initial data
-        fetchGraphData();
-        ApiConnector.loadCurrentData(this, true);
+        ApiConnector.loadCurrentData(this, mConsumedEmissions.isEmpty() && mProductionEmissions.isEmpty());
+        // Fetch graph data only if current datasets are empty
+        if (mConsumedEmissions.isEmpty() && mProductionEmissions.isEmpty())
+            fetchGraphData();
 
         mRefreshEmissionsButton.setOnClickListener(v -> ApiConnector.loadCurrentData(this, false));
 
@@ -124,24 +158,47 @@ public class MainActivity extends AppCompatActivity
         mButtonFixed14days.setOnClickListener(v -> chooseFixedLastDays(14));
         mButtonFixed30days.setOnClickListener(v -> chooseFixedLastDays(30));
         mButtonFixed90days.setOnClickListener(v -> chooseFixedLastDays(90));
+
+        // Locale buttons
+        mEnglishButton.setOnClickListener(v -> changeLanguage(Locale.ENGLISH));
+        mFinnishButton.setOnClickListener(v -> changeLanguage(mFinnishLocale));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save graph emissions
+        outState.putParcelableArrayList("consumedData", mConsumedEmissions);
+        outState.putParcelableArrayList("productionData", mProductionEmissions);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        final Context context = ContextWrapper.wrap(newBase, LocalStore.getInstance().getSelectedLanguage());
+        super.attachBaseContext(context);
+    }
+
+    private void changeLanguage(Locale locale) {
+        LocalStore.getInstance().setSelectedLanguage(locale);
+        recreate();
     }
 
     private void updateDate(ZonedDateTime dateTime, boolean isStartDate) {
         final boolean didDateChange;
         if (isStartDate) {
-            final ZonedDateTime validDate = (!dateTime.isAfter(mEndDate)
+            final ZonedDateTime validDate = (!dateTime.isAfter(LocalStore.getInstance().getEndDate())
                     ? dateTime
-                    : mEndDate)
+                    : LocalStore.getInstance().getEndDate())
                     .withHour(0).withMinute(0).withSecond(0);
-            didDateChange = !validDate.equals(mStartDate);
-            mStartDate = validDate;
+            didDateChange = !validDate.equals(LocalStore.getInstance().getStartDate());
+            LocalStore.getInstance().setStartDate(validDate);
         } else {
-            final ZonedDateTime validDate = (!mStartDate.isAfter(dateTime)
+            final ZonedDateTime validDate = (!LocalStore.getInstance().getStartDate().isAfter(dateTime)
                     ? dateTime
-                    : mStartDate)
+                    : LocalStore.getInstance().getStartDate())
                     .withHour(23).withMinute(59).withSecond(59);
-            didDateChange = !validDate.equals(mEndDate);
-            mEndDate = validDate;
+            didDateChange = !validDate.equals(LocalStore.getInstance().getEndDate());
+            LocalStore.getInstance().setEndDate(validDate);
         }
 
         updateDateButtonTexts();
@@ -152,8 +209,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateDateButtonTexts() {
-        mStartDateButton.setText(mStartDate.format(mDateButtonFormatter));
-        mEndDateButton.setText(mEndDate.format(mDateButtonFormatter));
+        mStartDateButton.setText(LocalStore.getInstance().getStartDate().format(mDateButtonFormatter));
+        mEndDateButton.setText(LocalStore.getInstance().getEndDate().format(mDateButtonFormatter));
     }
 
     private void fetchGraphData() {
@@ -161,8 +218,8 @@ public class MainActivity extends AppCompatActivity
             ApiConnector.getSampleDataFromFile(this, this, "consumed.json");
             ApiConnector.getSampleDataFromFile(this, this, "production.json");
         } else {
-            ApiConnector.loadConsumedData(this, mStartDate, mEndDate);
-            ApiConnector.loadProductionData(this, mStartDate, mEndDate);
+            ApiConnector.loadConsumedData(this);
+            ApiConnector.loadProductionData(this);
         }
 
         // Show loading dialog
@@ -185,7 +242,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void chooseFixedLastDays(int days) {
-        mEndDate = LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId());
+        LocalStore.getInstance().setEndDate(LocalDate.now().atTime(23, 59, 59).atZone(TimeZone.getDefault().toZoneId()));
         final ZonedDateTime newStartDate = LocalDate.now().atTime(0, 0, 0).atZone(TimeZone.getDefault().toZoneId())
                 .minusDays(days);
 
@@ -193,7 +250,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showDatePickerDialog(boolean isStartDateButton) {
-        final ZonedDateTime dateTime = isStartDateButton ? mStartDate : mEndDate;
+        final ZonedDateTime dateTime = isStartDateButton
+                ? LocalStore.getInstance().getStartDate()
+                : LocalStore.getInstance().getEndDate();
         final DialogFragment fragment = new DatePickerFragment(this, dateTime, isStartDateButton);
         fragment.show(getSupportFragmentManager(), "datePicker");
     }
@@ -212,8 +271,10 @@ public class MainActivity extends AppCompatActivity
                 final ArrayList<Entry> emissions = ApiConnector.parseEntriesFromRawEmissions(rawEmissions);
                 if (apiResponseType == ApiConnector.ResponseTypes.CONSUMED_EMISSIONS) {
                     mConsumedDataset.setValues(emissions);
+                    mConsumedEmissions = emissions;
                 } else {
                     mProductionDataset.setValues(emissions);
+                    mProductionEmissions = emissions;
                 }
                 forceLabelCount = Math.min(emissions.size(), 15);
             } break;
@@ -222,23 +283,24 @@ public class MainActivity extends AppCompatActivity
                 // Update last updated time
                 final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
                 final ZonedDateTime lastRefreshTime = ZonedDateTime.parse(rawEmissions.get(0).getStartTime(), formatter);
-                mRefreshEmissionsButton.setText("Updated at " + lastRefreshTime.getHour() + ":" + lastRefreshTime.getMinute());
+                mRefreshEmissionsButton.setText(String.format(getResources().getString(R.string.currentUpdatedAt),
+                        lastRefreshTime.getHour(), lastRefreshTime.getMinute()));
 
                 // Set current emissions
                 rawEmissions.forEach(e -> {
                     if (e.getVariableId() == 265) {
-                        mCurrentConsumedVal.setText("" + e.getValue());
+                        mCurrentConsumedVal.setText(String.valueOf(e.getValue()));
                     } else {
-                        mCurrentProductionVal.setText("" + e.getValue());
+                        mCurrentProductionVal.setText(String.valueOf(e.getValue()));
                     }
                 });
 
                 // Refresh graph datasets if last selected day matches current day and if new values were fetched
                 if (!isCached) {
                     final ZonedDateTime curDate = ZonedDateTime.now();
-                    if (curDate.getDayOfMonth() == mEndDate.getDayOfMonth()
-                            && curDate.getMonth() == mEndDate.getMonth()
-                            && curDate.getYear() == mEndDate.getYear()) {
+                    if (curDate.getDayOfMonth() == LocalStore.getInstance().getEndDate().getDayOfMonth()
+                            && curDate.getMonth() == LocalStore.getInstance().getEndDate().getMonth()
+                            && curDate.getYear() == LocalStore.getInstance().getEndDate().getYear()) {
                         fetchGraphData();
                     }
                 }

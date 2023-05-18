@@ -19,7 +19,7 @@
             android:background="@color/topBar"
             android:paddingTop="5dp"
             android:paddingBottom="10dp"
-            app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,textView,flowConsumed,flowProduction,buttonRefresh"
+            app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,flowLocales,flowConsumed,flowProduction,buttonRefresh"
             app:flow_maxElementsWrap="3"
             app:flow_horizontalGap="10dp"
             app:flow_horizontalStyle="packed"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintWidth_percent="0.28"
             app:layout_constraintWidth_max="120dp"
-            android:text="Current emission value for electricity consumed"
+            android:text="@string/currentConsumedInfo"
             android:textColor="@color/white"
             android:textSize="11sp" />
 
@@ -45,19 +45,36 @@
             android:layout_height="wrap_content"
             app:layout_constraintWidth_percent="0.28"
             app:layout_constraintWidth_max="120dp"
-            android:text="Current emission value of electricity production"
+            android:text="@string/currentProductionInfo"
             android:textColor="@color/white"
             android:textSize="11sp" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowLocales"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintWidth_percent="0.15"
-            app:layout_constraintWidth_max="120dp"
-            android:text="Test 3"
-            android:textColor="@color/white"
-            android:textSize="11sp" />
+            app:flow_horizontalGap="10dp"
+            app:constraint_referenced_ids="buttonLocaleGb,buttonLocaleFi" />
+
+        <ImageButton
+            android:id="@+id/buttonLocaleGb"
+            android:layout_width="28dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1.6:1"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
+            android:src="@drawable/gb"
+            android:contentDescription="@string/changeLocaleGb" />
+
+        <ImageButton
+            android:id="@+id/buttonLocaleFi"
+            android:layout_width="28dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1.6:1"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
+            android:src="@drawable/fi"
+            android:contentDescription="@string/changeLocaleFi" />
 
         <androidx.constraintlayout.helper.widget.Flow
             android:id="@+id/flowConsumed"
@@ -74,7 +91,7 @@
             android:layout_height="wrap_content"
             android:textAlignment="textEnd"
             android:textColor="@color/consumedEmissions"
-            android:text="0"
+            android:text="@string/currentEmissionValue"
             android:textSize="13sp" />
 
         <TextView
@@ -82,7 +99,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="textStart"
-            android:text="g CO2 / kWh"
+            android:text="@string/emissionUnit"
             android:textColor="@color/white"
             android:textSize="10sp"
             tools:ignore="SmallSp" />
@@ -103,7 +120,7 @@
             android:layout_height="wrap_content"
             android:textAlignment="textEnd"
             android:textColor="@color/productionEmissions"
-            android:text="0"
+            android:text="@string/currentEmissionValue"
             android:textSize="13sp" />
 
         <TextView
@@ -111,7 +128,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="textStart"
-            android:text="g CO2 / kWh"
+            android:text="@string/emissionUnit"
             android:textColor="@color/white"
             android:textSize="10sp"
             tools:ignore="SmallSp" />
@@ -120,9 +137,9 @@
             android:id="@+id/buttonRefresh"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintWidth_percent="0.15"
+            app:layout_constraintWidth_percent="0.20"
             app:layout_constraintWidth_max="120dp"
-            android:text="N/A"
+            android:text="@string/unknownTime"
             android:textAllCaps="false"
             style="@style/AppButtonTheme" />
 
@@ -144,37 +161,37 @@
             android:id="@+id/buttonFixedToday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today"
+            android:text="@string/fixedDateToday"
             style="@style/AppButtonTheme" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonFixed3days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last 3 days"
+            android:text="@string/fixedDate3days"
             style="@style/AppButtonTheme" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonFixed7days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last 7 days"
+            android:text="@string/fixedDate7days"
             style="@style/AppButtonTheme" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonFixed14days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last 14 days"
+            android:text="@string/fixedDate14days"
             style="@style/AppButtonTheme" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonFixed30days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last 30 days"
+            android:text="@string/fixedDate30days"
             style="@style/AppButtonTheme" />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonFixed90days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last 3 months"
+            android:text="@string/fixedDate3months"
             style="@style/AppButtonTheme" />
 
         <!-- Date pickers -->
@@ -197,26 +214,26 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textColor="@color/black"
-            android:text="Or choose a custom date range:"
+            android:text="@string/chooseCustomDate"
             />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonStartDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start date"
+            android:text="@string/unknownTime"
             style="@style/AppButtonTheme" />
 
         <TextView
             android:id="@+id/textDatePickersDash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-" />
+            android:text="@string/dateDash" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonEndDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="End date"
+            android:text="@string/unknownTime"
             style="@style/AppButtonTheme" />
 
         <!-- Chart -->

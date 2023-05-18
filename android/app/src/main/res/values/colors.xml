@@ -12,4 +12,5 @@
     <color name="productionEmissions">#63FF84</color>
     <color name="topBar">#788087</color>
     <color name="buttonColor">#a0a6ab</color>
+    <color name="selectedLocale">#ff0000</color>
 </resources>
