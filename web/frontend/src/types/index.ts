@@ -23,6 +23,7 @@ export type CurrentEmissionData = {
 export type CurrentEmissions = {
   consumed: CurrentEmissionData,
   production: CurrentEmissionData,
+  cached: boolean,
 };
 
 export type Locales = "en-gb" | "fi-fi";

@@ -8,8 +8,6 @@ import { GraphDates, Locales } from "../types";
 const GraphButtonStyle: React.CSSProperties = {
   marginBottom: "0.5em",
   backgroundColor: "#4d525678",
-  borderTopLeftRadius: "0",
-  borderTopRightRadius: "0",
   borderTop: "0",
   fontSize: "0.7rem",
 };
@@ -60,6 +58,8 @@ const DateButton = ({ onClick, text }: DateButtonProps) => (
     onClick={onClick}
     style={{
       marginRight: "20px",
+      borderTopLeftRadius: "0",
+      borderTopRightRadius: "0",
       ...GraphButtonStyle,
     }}
   >

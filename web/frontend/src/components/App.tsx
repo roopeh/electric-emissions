@@ -13,6 +13,7 @@ const App = () => {
   const [currentEmissions, setCurrentEmissions] = useState<CurrentEmissions>({
     consumed: { value: 0, variable_id: 265, start_time: "0" },
     production: { value: 0, variable_id: 266, start_time: "0" },
+    cached: false,
   });
   const [graphEmissions, setGraphEmissions] = useState<GraphDatasets>({
     consumed: new Array<JsonData>(),
@@ -25,26 +26,6 @@ const App = () => {
   const [errorText, setErrorText] = useState<string>("");
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [language, setLanguage] = useState<Locales>("en-gb");
-
-  const getCurrentEmissions = async (): Promise<void> => {
-    try {
-      const emissions = await emissionService.getCurrentEmissions();
-      setCurrentEmissions(emissions);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        if (err.response) {
-          setErrorText(err.response.data.error);
-        } else {
-          setErrorText("Could not connect to server");
-        }
-      }
-    }
-  };
-
-  // Get current emissions only on first render
-  useEffect(() => {
-    getCurrentEmissions();
-  }, []);
 
   const loadGraphData = async (): Promise<void> => {
     setLoadingData(true);
@@ -67,29 +48,48 @@ const App = () => {
     setLoadingData(false);
   };
 
+  const getCurrentEmissions = async (initialLoad: boolean): Promise<void> => {
+    try {
+      const emissions = await emissionService.getCurrentEmissions();
+      setCurrentEmissions(emissions);
+
+      // Refresh graph datasets only if last selected day matches current day
+      // and if new values were fetched
+      // Also, prevent double API fetch on initial load
+      if (!emissions.cached && !initialLoad) {
+        const curDate = new Date();
+        if (curDate.getDate() === dates.endDate.getDate()
+        && curDate.getMonth() === dates.endDate.getMonth()
+        && curDate.getFullYear() === dates.endDate.getFullYear()) {
+          loadGraphData();
+        }
+      }
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        if (err.response) {
+          setErrorText(err.response.data.error);
+        } else {
+          setErrorText("Could not connect to server");
+        }
+      }
+    }
+  };
+
+  // Get current emissions only on first render
+  useEffect(() => {
+    getCurrentEmissions(true);
+  }, []);
+
   // Get consumed and production emissions when dates change
   useEffect(() => {
     loadGraphData();
   }, [dates]);
 
-  const handleRefresh = (): void => {
-    getCurrentEmissions();
-
-    const curDate = new Date();
-
-    // Refresh graph datasets only if last selected day matches current day
-    if (curDate.getDate() === dates.endDate.getDate()
-    && curDate.getMonth() === dates.endDate.getMonth()
-    && curDate.getFullYear() === dates.endDate.getFullYear()) {
-      loadGraphData();
-    }
-  };
-
   return (
     <div className="main">
       <AppBar
         currentEmissions={currentEmissions}
-        refreshFunc={handleRefresh}
+        refreshFunc={() => getCurrentEmissions(false)}
         language={language}
         languageFunc={setLanguage}
       />

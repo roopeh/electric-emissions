@@ -19,4 +19,5 @@ export type CurrentEmissionData = {
 export type CurrentEmissions = {
   consumed: CurrentEmissionData | undefined,
   production: CurrentEmissionData | undefined,
+  cached: boolean,
 };

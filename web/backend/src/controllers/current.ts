@@ -9,6 +9,7 @@ const currentRouter = Router();
 const currentEmissions: CurrentEmissions = {
   consumed: undefined,
   production: undefined,
+  cached: false,
 };
 
 let lastUpdateTimeMs: number = 0;
@@ -19,7 +20,10 @@ currentRouter.get("/", async (_req, res) => {
   // Get new current emission values every 1 minutes
   // otherwise return cached values
   if (lastUpdateTimeMs !== 0 && ((curTime - lastUpdateTimeMs) < 1 * 60 * 1000)) {
-    res.status(200).json(currentEmissions);
+    res.status(200).json({
+      ...currentEmissions,
+      cached: true,
+    });
     return;
   }
 
@@ -40,7 +44,10 @@ currentRouter.get("/", async (_req, res) => {
         currentEmissions.production = itr;
       }
     });
-    res.status(200).json(currentEmissions);
+    res.status(200).json({
+      ...currentEmissions,
+      cached: false,
+    });
   } catch (err) {
     const apiErrorBody = handleApiError({ responseType: "current", err });
     res.status(apiErrorBody.code).json({ error: apiErrorBody.message });
