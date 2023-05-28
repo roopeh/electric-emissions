@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +23,7 @@
             app:constraint_referenced_ids="textConsumedInfo,textProductionInfo,flowLocales,flowConsumed,flowProduction,buttonRefresh"
             app:flow_maxElementsWrap="3"
             app:flow_horizontalGap="10dp"
+            app:flow_verticalGap="5dp"
             app:flow_horizontalStyle="packed"
             app:flow_verticalStyle="packed"
             app:flow_wrapMode="aligned"
@@ -87,12 +89,13 @@
 
         <TextView
             android:id="@+id/textConsumedValue"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="textEnd"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp"
             android:textColor="@color/consumedEmissions"
             android:text="@string/currentEmissionValue"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/textConsumedValueUnit"
@@ -116,12 +119,13 @@
 
         <TextView
             android:id="@+id/textProductionValue"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="textEnd"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp"
             android:textColor="@color/productionEmissions"
             android:text="@string/currentEmissionValue"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/textProductionValueUnit"
@@ -236,21 +240,126 @@
             android:text="@string/unknownTime"
             style="@style/AppButtonTheme" />
 
+        <TextView
+            android:id="@+id/textError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:visibility="gone"
+            android:text=""
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:textColor="@color/consumedEmissions"
+            app:layout_constraintTop_toBottomOf="@id/flowDatePickers"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <!-- Chart -->
         <androidx.constraintlayout.helper.widget.Flow
             android:id="@+id/flowChart"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:layout_constraintTop_toBottomOf="@id/flowDatePickers"
-            app:layout_constraintStart_toStartOf="@id/flowDatePickers"
-            app:constraint_referenced_ids="graphChart" />
+            android:layout_marginTop="10dp"
+            app:layout_constraintWidth_percent="0.95"
+            app:layout_constraintTop_toBottomOf="@id/textError"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:flow_horizontalGap="5dp"
+            app:flow_horizontalStyle="packed"
+            app:flow_wrapMode="chain"
+            app:constraint_referenced_ids="graphChartLeftYLegend,graphChart,graphChartRightYLegend" />
+
+        <com.roopeh.electricemissions.VerticalTextView
+            android:id="@+id/graphChartLeftYLegend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:gravity="bottom"
+            android:textSize="11sp"
+            android:text="@string/emissionUnit" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/graphChart"
             android:layout_width="0dp"
-            android:layout_height="200dp"
-            app:layout_constraintWidth_percent="1"
-            app:layout_constraintWidth_max="550dp" />
+            android:layout_height="200dp" />
+
+        <com.roopeh.electricemissions.VerticalTextView
+            android:id="@+id/graphChartRightYLegend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:gravity="top"
+            android:textSize="11sp"
+            android:text="@string/emissionUnit" />
+
+        <!-- Footer -->
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:background="@color/footer"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/flowChart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:flow_verticalGap="10dp"
+            app:flow_wrapMode="chain"
+            app:constraint_referenced_ids="textFooterHeader,textFooter1,textFooter2,textFooter3,textFooter4" />
+
+        <TextView
+            android:id="@+id/textFooterHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.85"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="@string/footerTitle" />
+        <TextView
+            android:id="@+id/textFooter1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.8"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:text="@string/footerPar1" />
+        <TextView
+            android:id="@+id/textFooter2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.8"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:text="@string/footerPar2" />
+        <TextView
+            android:id="@+id/textFooter3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.8"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:text="@string/footerPar3" />
+        <TextView
+            android:id="@+id/textFooter4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.8"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:text="@string/footerPar4" />
+        <!-- Filler layout -->
+        <RelativeLayout
+            android:id="@+id/fillerFooter"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/footer"
+            app:layout_constraintTop_toBottomOf="@id/flowFooter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

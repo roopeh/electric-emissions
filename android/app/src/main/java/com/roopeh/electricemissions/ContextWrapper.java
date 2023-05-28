@@ -22,7 +22,6 @@ public class ContextWrapper extends android.content.ContextWrapper {
             res.getConfiguration().setLocales(localeList);
 
             context = context.createConfigurationContext(res.getConfiguration());
-
         } else {
             res.getConfiguration().locale = newLocale;
             res.updateConfiguration(res.getConfiguration(), res.getDisplayMetrics());

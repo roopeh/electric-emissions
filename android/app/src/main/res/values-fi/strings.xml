@@ -21,4 +21,11 @@
     <!-- Chart -->
     <string name="consumedEmissions">Kulutetun sähkön päästöarvo Suomessa</string>
     <string name="productionEmissions">Tuotetun sähkön päästöarvo Suomessa</string>
+
+    <!-- Footer -->
+    <string name="footerTitle">Tietoa</string>
+    <string name="footerPar1">Kaaviossa on esitetty lähes reaaliajassa lasketut hiilidioksidipäästöarviot Suomen sähköntuotannosta ja arvio tuotetun sähkön hiilidioksidipäästöistä, joka kulutetaan Suomessa.</string>
+    <string name="footerPar2">Sähköntuotannon päästöt arvioidaan laskemalla yhteen eri sähköntuotantotyypin tuotteet ja niiden päästökertoimet, ja jakamalla summa Suomen sähkön kokonaistuotannolla.</string>
+    <string name="footerPar3">Kulutetun sähkön päästöt arvioidaan ottamalla huomioon Suomen sähköntuotanto, sähkön tuonti sekä sähkön vienti.</string>
+    <string name="footerPar4">Yläpalkissa voit nähdä päästöarvot lähes reaaliajassa. Päästötiedot päivitetään kerran 3 minuutissa fingrid.fi sivustolle.</string>
 </resources>

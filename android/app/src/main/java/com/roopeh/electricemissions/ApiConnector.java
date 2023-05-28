@@ -59,7 +59,7 @@ public class ApiConnector {
             is.close();
             responseInterface.onApiResponse(responseType, parseRawEmissionsFromString(new String(buffer, StandardCharsets.UTF_8)), false);
         } catch (IOException err) {
-            responseInterface.onApiError(500, "Unknown parse error when parsing data");
+            responseInterface.onApiError(responseType, 500, "Unknown parse error when parsing data");
             err.printStackTrace();
         }
     }
@@ -78,7 +78,7 @@ public class ApiConnector {
                 responseInterface.onApiResponse(ResponseTypes.CONSUMED_EMISSIONS, result, false);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CONSUMED_EMISSIONS, error.networkResponse.statusCode);
-                responseInterface.onApiError(errBody.first, errBody.second);
+                responseInterface.onApiError(ResponseTypes.CURRENT_EMISSIONS, errBody.first, errBody.second);
                 error.printStackTrace();
         });
 
@@ -99,7 +99,7 @@ public class ApiConnector {
                 responseInterface.onApiResponse(ResponseTypes.PRODUCTION_EMISSIONS, result, false);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.PRODUCTION_EMISSIONS, error.networkResponse.statusCode);
-                responseInterface.onApiError(errBody.first, errBody.second);
+                responseInterface.onApiError(ResponseTypes.PRODUCTION_EMISSIONS, errBody.first, errBody.second);
                 error.printStackTrace();
         });
 
@@ -130,7 +130,7 @@ public class ApiConnector {
                 responseInterface.onApiResponse(ResponseTypes.CURRENT_EMISSIONS, result, initialLoad);
             }, error -> {
                 final Pair<Integer, String> errBody = handleApiError(ResponseTypes.CURRENT_EMISSIONS, error.networkResponse.statusCode);
-                responseInterface.onApiError(errBody.first, errBody.second);
+                responseInterface.onApiError(ResponseTypes.CURRENT_EMISSIONS, errBody.first, errBody.second);
                 error.printStackTrace();
         });
 

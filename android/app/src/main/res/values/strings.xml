@@ -5,6 +5,8 @@
     <string name="currentEmissionValue" translatable="false">0</string>
     <string name="unknownTime" translatable="false">N/A</string>
     <string name="dateDash" translatable="false">-</string>
+    <string name="chartMarkerValue" translatable="false">: %1$.3f</string>
+    <string name="errorText" translatable="false">Error: %1$s</string>
 
     <!-- App bar -->
     <string name="currentConsumedInfo">Current emission value for electricity consumed</string>
@@ -27,4 +29,11 @@
     <!-- Chart -->
     <string name="consumedEmissions">Emission factor for electricity consumed in Finland</string>
     <string name="productionEmissions">Emission factor of electricity produced in Finland</string>
+
+    <!-- Footer -->
+    <string name="footerTitle">About</string>
+    <string name="footerPar1">Within chart are shown near in real time calculated carbon dioxide emission estimate of electricity production in Finland and estimate of carbon dioxide of produced electricity, which is consumed in Finland.</string>
+    <string name="footerPar2">Emissions of electricity production are estimated by summing each product of different electricity production type and their emission factor together, and by dividing the sum by Finland\'s total electricity production.</string>
+    <string name="footerPar3">Emissions for electricity consumed are estimated by taking Finland\'s electricity production, electricity import as well as electricity export into account.</string>
+    <string name="footerPar4">In the top you may see emissions near in real time. Emission data is updated every 3 minutes at fingrid.fi</string>
 </resources>
